@@ -1,11 +1,12 @@
 - [Go Programming Language](#go-programming-language)
   - [Simple Go program](#simple-go-program)
+  - [Data Types](#data-types)
+    - [Integers](#integers)
 # Go Programming Language
 ## Simple Go program
 Let's start using the classic hello world program to explain the basic syntax of a go program.
 ```go
 package main
-
 import "fmt"
 
 func main() {
@@ -34,3 +35,15 @@ func main();
 }
 ```
 As you can see, that will create a function without a body, so you get the error.
+
+## Data Types
+Go has the following basic types.
+* int int8 int16 int32 int64 uint uint8 uint16  uint64 uintptr
+* float32 float64
+* string
+* bool
+* byte
+* rune
+* complex64 complex128
+
+### Integers
