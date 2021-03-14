@@ -1,9 +1,95 @@
 - [Go Programming Language](#go-programming-language)
-  - [Simple Go program](#simple-go-program)
-  - [Data Types](#data-types)
-    - [Integers](#integers)
+- [Setting up Go](#setting-up-go)
+  - [Installing Go](#installing-go)
+  - [Organizing Your Projects](#organizing-your-projects)
+- [A Simple Go program](#a-simple-go-program)
+- [Data Types](#data-types)
+  - [Integers](#integers)
 # Go Programming Language
-## Simple Go program
+
+# Setting up Go
+
+## Installing Go
+
+You can find the lastest version of Go and instructions of how to install it on your operating system in https://golang.org/dl/.  
+
+The installation program should remove any previous  version of  Go, install Go in the right location and add to go command to the path.
+
+To verify that go has been installed properly run the following from the command line.
+
+```shell
+go version
+go version go1.16.2 darwin/amd6
+```
+
+You should get a output similar to the one above,  displaying the version of Go installed.
+
+## Organizing Your Projects
+
+Over the years the way Go projects are organized has change.  For modern Go projects,  you are free to organize your code any way it works for you.
+
+By default, the third-party tools installed running go install are located in $HOME/go. It is recommend that you set the $GOPATH enviromental variable to $HOME/go.
+
+In Linux systems using bash add the following lines to your .profile.
+
+```shell
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+```
+
+If you are using a MAC with the zsh shell add the line to .zshrc.
+
+On Windows, run the following commands at the prompt:
+
+setx GOPATH %USERPROFILE%\go
+setx path %path%;%USERPROFILE%\bin
+
+
+You can get the go enviroment running the go env command
+
+```shell
+go env
+GO111MODULE=""
+GOARCH="amd64"
+GOBIN=""
+GOCACHE="/Users/blasvinas/Library/Caches/go-build"
+GOENV="/Users/blasvinas/Library/Application Support/go/env"
+GOEXE=""
+GOFLAGS=""
+GOHOSTARCH="amd64"
+GOHOSTOS="darwin"
+GOINSECURE=""
+GOMODCACHE="/Users/blasvinas/go/pkg/mod"
+GONOPROXY=""
+GONOSUMDB=""
+GOOS="darwin"
+GOPATH="/Users/blasvinas/go"
+GOPRIVATE=""
+GOPROXY="https://proxy.golang.org,direct"
+GOROOT="/usr/local/go"
+GOSUMDB="sum.golang.org"
+GOTMPDIR=""
+GOTOOLDIR="/usr/local/go/pkg/tool/darwin_amd64"
+GOVCS=""
+GOVERSION="go1.16.2"
+GCCGO="gccgo"
+AR="ar"
+CC="clang"
+CXX="clang++"
+CGO_ENABLED="1"
+GOMOD="/dev/null"
+CGO_CFLAGS="-g -O2"
+CGO_CPPFLAGS=""
+CGO_CXXFLAGS="-g -O2"
+CGO_FFLAGS="-g -O2"
+CGO_LDFLAGS="-g -O2"
+PKG_CONFIG="pkg-config"
+GOGCCFLAGS="-fPIC -arch x86_64 -m64 -pthread -fno-caret-diagnostics -Qunused-arguments -fmessage-length=0 -fdebug-prefix-map=/var/folders/vs/t98y17fn2gsdjllr5zmqg7q00000gn/T/go-build2207945809=/tmp/go-build -gno-record-gcc-switches -fno-common"
+```
+
+
+
+# A Simple Go program
 Let's start using the classic hello world program to explain the basic syntax of a go program.
 ```go
 package main
@@ -36,7 +122,7 @@ func main();
 ```
 As you can see, that will create a function without a body, so you get the error.
 
-## Data Types
+# Data Types
 Go has the following basic types.
 * int int8 int16 int32 int64 uint uint8 uint16  uint64 uintptr
 * float32 float64
@@ -46,4 +132,4 @@ Go has the following basic types.
 * rune
 * complex64 complex128
 
-### Integers
+## Integers
