@@ -1,16 +1,22 @@
 - [Go Programming Language](#go-programming-language)
 - [Setting up Go](#setting-up-go)
-  - [Installing Go](#installing-go)
-  - [Organizing Your Projects](#organizing-your-projects)
+	- [Installing Go](#installing-go)
+	- [Organizing Your Projects](#organizing-your-projects)
 - [A Simple Go program](#a-simple-go-program)
-  - [Go Standard format](#go-standard-format)
-  - [Go Style](#go-style)
-  - [Running the program program](#running-the-program-program)
+	- [Go Standard format](#go-standard-format)
+	- [Go Style](#go-style)
+	- [Running the program program](#running-the-program-program)
 - [Data Types](#data-types)
-  - [Booleans](#booleans)
-  - [Integers](#integers)
-  - [Floating Point](#floating-point)
-  - [Complex Numbers](#complex-numbers)
+	- [Booleans](#booleans)
+	- [Integers](#integers)
+	- [Floating Point](#floating-point)
+	- [Complex Numbers](#complex-numbers)
+	- [Strings](#strings)
+	- [Runes](#runes)
+- [Operators](#operators)
+	- [Arithmetic Operators](#arithmetic-operators)
+	- [Comparison Operators](#comparison-operators)
+	- [Logical Operators](#logical-operators)
 # Go Programming Language
 
 # Setting up Go
@@ -191,6 +197,7 @@ go install github.com/git_user/golang/hello_world@latest
 
 This will download the files from the git repository in github.com/git_user/golang/hello_world and installed in \$GOPATH/bin/hello_world
 
+
 # Data Types
 Go has the following basic types.
 * Booleans
@@ -202,20 +209,20 @@ Go has the following basic types.
 
 ## Booleans
 
-A boolean can only have two values: true or false. The zero value (the default value when the variable is not initialized) is false.  You can declare a boolean valiable using the bool type as shown below.
+A boolean can only have two values: true or false. The zero value (the default value when the variable is not initialized) is false.  You can declare a boolean variable using the bool type as shown below.
 
 ```go
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 func main() {
-	var isOk bool // false (zero value)
-	fmt.Println(isOk) // false
-	isOk = true
-	fmt.Println(isOk)	// true
+    var isOk bool // false (zero value)
+    fmt.Println(isOk) // false
+    isOk = true
+    fmt.Println(isOk)   // true
 }
 ```
 
@@ -240,7 +247,7 @@ Go define some aliases to some of of the integer types as described below.
 * int alias to int32 or int64 depending on the number of bits of the CPU where you are running the program.
 * uint alias to unsigned int.
 
-Unless you have a specific need about the size or the sign,  use int when declaring your valiables.
+Unless you have a specific need about the size or the sign,  use int when declaring your variables.
 
 ```go
 package main
@@ -248,9 +255,9 @@ package main
 import "fmt"
 
 func main() {
-	var myNumber int // 0 (zero value)
-	myNumber = 5
-	fmt.Println(myNumber) // 5
+    var myNumber int // 0 (zero value)
+    myNumber = 5
+    fmt.Println(myNumber) // 5
 }
 ```
 
@@ -269,42 +276,179 @@ The following is a sample program using float32 and float64
 package main
 
 import (
-	"fmt"
-	"math"
+    "fmt"
+    "math"
 )
 
 func main() {
-	var myFloat32 float32 // 0 (zero value)
-	var myFloat64 float64 // 0 (zero value)
+    var myFloat32 float32 // 0 (zero value)
+    var myFloat64 float64 // 0 (zero value)
 
-	myFloat32 = math.MaxFloat32
-	fmt.Println(myFloat32) // 3.4028235e+38
-	myFloat64 = math.MaxFloat64
-	fmt.Println(myFloat64) // 1.7976931348623157e+308
+    myFloat32 = math.MaxFloat32
+    fmt.Println(myFloat32) // 3.4028235e+38
+    myFloat64 = math.MaxFloat64
+    fmt.Println(myFloat64) // 1.7976931348623157e+308
 }
 ```
 
-You float64 unless you haver a specific need to use float32.
+You float64 unless you have a specific need to use float32.
 
 ## Complex Numbers
 
-Go defines two  complex number types.
+Go defines two complex number types.
 
-* complex64 use float32 to represent the real and imaginary parts.
-* complex128 use float64 to represent the real and imaginary parts.
+* complex64 uses float32 to represent the real and imaginary parts.
+* complex128 uses float64 to represent the real and imaginary parts.
 
-Complex numbers are numbers that consisy of two parts, a real number and an imaginary number.  They are represented in the form a + bi.  Below is an example of a program that declares a complex number.
+Complex numbers are numbers that consist of two parts, a real number, and an imaginary number.  They are represented in the form a + bi.  Below is an example of a program that declares a complex number.
 
 ```go
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 func main() {
-	var myNumber complex64 // (0+0i) (zero value)
-	myNumber = complex(3.5, 2.3) 
-	fmt.Println(myNumber) // (3.5+2.3i)
+    var myNumber complex64 // (0+0i) (zero value)
+    myNumber = complex(3.5, 2.3) 
+    fmt.Println(myNumber) // (3.5+2.3i)
+}
+```
+
+## Strings
+
+In Go, a string is a series of bytes. You can put any Unicode value into a string. Strings are immutable; once created, you cannot change their value.  So in a program, every time you change the content of a string variable, you are creating a new string in reality.  Go uses double-quotes for strings, as shown in the program below.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    var message string
+    message = "Hello Go programmers!"
+    fmt.Println(message) // Hello Go programmers!
+}
+```
+
+## Runes
+
+Runes are used to represent single characters.  The rune type is an alias for the int32 type.  In Go, runes are written using single quotes.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    var r rune
+    r = 'A'
+    fmt.Println(r) // 65
+}
+```
+
+When you print a run, the output will be the numeric code representing the rune and not the original character. So, the program above with print 65 instead of A.
+
+# Operators
+
+## Arithmetic Operators
+
+Go has the following arithmetic operators.
+
+| Operator | Description | Data Types |
+|----------|-------------|------------|
+|+ | sum | integers, floats, complex values, strings|
+| - |   difference |            integers, floats, complex values |
+| * |   product |               integers, floats, complex values |
+| / |   quotient |              integers, floats, complex values |
+| % |   remainder |             integers |
+| & |   bitwise AND |           integers |
+| \||    bitwise OR |            integers |
+| ^ |   bitwise XOR |           integers |
+| &^|   bit clear (AND NOT)|    integers |
+| <<|   left shift |            integer << unsigned integer |
+| >>|   right shift  |          integer >> unsigned integer |
+
+You can combine the arithmetic operator with = to modify a variable, for example +=, *=, -+, /=, ++, --.  See the example below.
+
+## Comparison Operators
+
+The table below shows the comparison operators supported by Go.
+
+| Operator | Description |
+|----------|-------------|
+| ==  |  equal |
+| !=  |  not equal |
+| <   |  less |
+| <=  |  less or equal |
+| >  |   greater |
+| >= |   greater or equal| 
+
+## Logical Operators
+
+Below is a list of the logical operators
+
+| Operator | Description |
+|----------|-------------|
+| && | AND |
+| \|\| | OR |
+| ! | NOT |
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    //Arithmetic operators
+    a, b := 4, 2
+    r := (a + b) / (a - b) * 2
+    fmt.Println(r) //6
+
+    r = 9 % a
+    fmt.Println(r) // 1
+
+    //Assignment operators
+    a, b = 2, 3
+    a += b
+    fmt.Println(a) // 5
+
+    b -= 2
+    fmt.Println(b) // 1
+
+    b *= 10
+    fmt.Println(b) // 10
+
+    b /= 5
+    fmt.Println(b) // 2
+
+    a %= 3
+    fmt.Println(a) // 2
+
+    x := 1
+    x++
+    fmt.Println(x) // 2
+
+    x--
+    fmt.Println(x) // 1
+
+    //Comparison Operators
+    a, b = 5, 10
+    fmt.Println(a == b) // false
+    fmt.Println(a != b) // true
+    fmt.Println(a > 5) // false
+    fmt.Println(a >= 5) // true
+    fmt.Println(b < a, 10 <= b) // false true
+
+    //Logical Operators
+    a, b = 5, 10
+    fmt.Println(a > 1 && b == 10) // true
+    fmt.Println(a == 5 || b == 100) // true
+    fmt.Println(!(a > 0)) // false
 }
 ```
