@@ -1,22 +1,24 @@
 - [Go Programming Language](#go-programming-language)
 - [Setting up Go](#setting-up-go)
-	- [Installing Go](#installing-go)
-	- [Organizing Your Projects](#organizing-your-projects)
+  - [Installing Go](#installing-go)
+  - [Organizing Your Projects](#organizing-your-projects)
 - [A Simple Go program](#a-simple-go-program)
-	- [Go Standard format](#go-standard-format)
-	- [Go Style](#go-style)
-	- [Running the program program](#running-the-program-program)
+  - [Go Standard format](#go-standard-format)
+  - [Go Style](#go-style)
+  - [Running the program program](#running-the-program-program)
 - [Data Types](#data-types)
-	- [Booleans](#booleans)
-	- [Integers](#integers)
-	- [Floating Point](#floating-point)
-	- [Complex Numbers](#complex-numbers)
-	- [Strings](#strings)
-	- [Runes](#runes)
+  - [Booleans](#booleans)
+  - [Integers](#integers)
+  - [Floating Point](#floating-point)
+  - [Complex Numbers](#complex-numbers)
+  - [Strings](#strings)
+  - [Runes](#runes)
 - [Operators](#operators)
-	- [Arithmetic Operators](#arithmetic-operators)
-	- [Comparison Operators](#comparison-operators)
-	- [Logical Operators](#logical-operators)
+  - [Arithmetic Operators](#arithmetic-operators)
+  - [Comparison Operators](#comparison-operators)
+  - [Logical Operators](#logical-operators)
+- [Variables](#variables)
+- [Constants](#constants)
 # Go Programming Language
 
 # Setting up Go
@@ -451,4 +453,108 @@ func main() {
     fmt.Println(a == 5 || b == 100) // true
     fmt.Println(!(a > 0)) // false
 }
+```
+
+# Variables
+
+In Go, you have several ways to declare a variable. The most verbose way is using the var keyword, explicitly specify the type, and assign a value. 
+
+```go
+var a int = 5
+```
+
+The previous example declares a variable named a as an integer and assigns 5 to it.
+
+When you assign a value to a variable during the declaration, you can omit the type, and Go will infer the type from the value. You can rewrite the line above as follow.
+
+```go
+var a = 5
+```
+
+If you just need to declare a variable;e and assign a value later, you need to specify the type. The variable will be initialized to the zero value.
+
+```go
+var a int // initialized to 0 (zero value)
+```
+
+You can declare several variables in one line.
+
+```go
+var x, y float64 // x = 0.0, y = 0.0
+var a, b = 4, 3 // a = 4, b = 3
+var c, d = "one", "two" // c = "one", d = "two"
+```
+
+If you need to declare multiple variables simultaneously, you can use the syntax shown below.
+
+```go
+var (
+ x int
+ y float64
+ i int = 5
+ d = "Hello"
+)
+```
+
+Another way to declare a variable is using the := operator. 
+
+```go
+i := 5
+x := 6.3
+d := "hello"
+a, b := 4, 3
+```
+You can only use the := operator inside a function. You cannot use it to declare variables at the package level. Also, using :=, you can assign values to an existing variable as long as one variable on the lefthand side of the := is new.
+
+```go
+x = 5
+x, y := 3, 2
+a = 4
+y, a = 6, 8 // Error, a and y already exist
+```
+
+In Go, you must use a variable. If you declare a variable in a function and don't use it, you will get an error at compilation time.
+
+```go
+// This program won't compile
+package main
+
+import (
+ "fmt"
+)
+
+func main() {
+ var a int
+ b := 5
+ fmt.Println(b)
+}
+```
+
+If you try to compile this program, you will get the following error: a declared but not used.
+
+# Constants
+
+You can declare a constant using the const keyword.
+
+```go
+const a = 5
+a = 3 // Error: cannot assign to a (declared const)
+```
+
+In Go, const can only hold values that are known at compilation time.
+
+When you declare a constant without specified a type, the constant is untyped, for example.
+
+```go
+const a = 5
+var x float64 = a
+var y int = a
+```
+
+If you declare a constant with a type, it can only be assigned to a variable of the same type.
+
+```go
+ const a int = 5
+ var x float64 = a // Error: cannot use a (type int) as type float64 in assignment
+ var y int = a
 ```
