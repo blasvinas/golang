@@ -19,6 +19,7 @@
   - [Logical Operators](#logical-operators)
 - [Variables](#variables)
 - [Constants](#constants)
+- [Arrays](#arrays)
 # Go Programming Language
 
 # Setting up Go
@@ -557,4 +558,79 @@ If you declare a constant with a type, it can only be assigned to a variable of 
  const a int = 5
  var x float64 = a // Error: cannot use a (type int) as type float64 in assignment
  var y int = a
+```
+
+# Arrays
+
+Most of the time, you will not use arrays directly in go since they have several limitations.  For the vast majority of the cases, use slices (which we will explain in the next section) instead of arrays.
+
+Below are several ways you can use to declare an array.
+
+```go
+var a[5] int // array of 5 integers each one initialized to 0
+    var a = [3]int{1, 2, 3} //arrray of 3 integers wich values of 1,2, and 3
+    var b = [...]float64{1.1, 5.3, 7.8}  // Array of 3 float64 numbers.
+    var c = [10]int{1,2,5:8,8:2} //{1,2,0,0,8,0,0,2,0,0}
+```
+In the last declaration, you can specify the index to be initialized using index:value.   The elements not defined will be initialized to the zero value.
+
+When you declare an array, the array's size is part of the type, so [5]int is not the same type as [3]int.
+
+You can access the elements of an array using the brackets and the index.
+
+```go
+a[5] = 8
+```
+
+The length of the array must be known at compilation time, so you cannot use a variable to define the number of elements.  The following won't compile.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    var len = 3
+    var a[len]int // error, you can not use a variable to define the number of elements.
+    fmt.Println(a)
+}
+```
+
+The following program shows how to declare and use an array.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    var x [5]int
+
+    x[0] = 1
+    x[1] = 3
+    x[2] = 5
+    x[3] = 7
+    x[4] = 11
+    fmt.Println(x) // [1,3,5,7,11]
+}
+```
+
+You can have an array containing another array.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    var x = [2][3]int{{1, 2, 3}, {4, 5, 6}}
+    fmt.Println(x[1][2]) // 6
+
+}
 ```
