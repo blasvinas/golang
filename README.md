@@ -20,6 +20,14 @@
 - [Variables](#variables)
 - [Constants](#constants)
 - [Arrays](#arrays)
+- [Slices](#slices)
+  - [append](#append)
+  - [len](#len)
+  - [cap](#cap)
+  - [make](#make)
+  - [Slicing](#slicing)
+- [Maps](#maps)
+  - [delete](#delete)
 # Go Programming Language
 
 # Setting up Go
@@ -337,6 +345,30 @@ func main() {
 }
 ```
 
+You can use slice expressions with strings the same way you use them with slices (See Slices).  
+
+```go
+    s1 := "Hello Go!"
+    s2 := s1[0:5]
+    fmt.Println(s2) // Hello
+```
+
+You can also use the [] to access an individual element of the string, but the results might not be what you expect.
+
+```go
+    s := "Hello Go!"
+    fmt.Println(s[1]) // 101
+```
+
+You might be expecting the output to be 'e', but it is  101, which is the Unicode for 'e'.  Some characters take more than one byte, so if you try to get their value using [], you will get something else.
+
+Remember that strings are immutable, so a program with the following lines won't compile.
+
+```go
+    s := "Hello Go!"
+    s[1] = 'a'  // Error: cannot assign to s[1] (strings are immutable)
+```
+
 ## Runes
 
 Runes are used to represent single characters.  The rune type is an alias for the int32 type.  In Go, runes are written using single quotes.
@@ -634,3 +666,196 @@ func main() {
 
 }
 ```
+
+# Slices
+
+Slices look similar to arrays, but they do not have the limitations of arrays like the fixed size, for example.  Below is an example of declaring slices.
+
+```go
+    var x[]int
+    var y = []int{1,2,3}
+```
+
+From the previous example, x is initialized to nil, which is the zero value of a slice. The nil value means that the slice does not contain anything.
+
+Notice that the declaration of the slice y is very similar to the way we declare arrays, but without the ... inside the brackets.
+
+## append
+
+You can add values at the end of a slice using append. Append takes two parameters: the name of the array and the value or values to add.
+
+```go
+append(x,5)
+append(y,7,8,9)
+```
+
+Also, you can append one slice to another slice using the ... operator.
+
+```go
+x := []int{1,2,3}
+y = append(y, x...)
+```
+
+## len
+
+You can get the number of elements in a slice using len.
+
+```go
+x := []int{1,2,3}
+fmt.Println(len(x)) // 3
+```
+
+## cap
+
+Elements in a slide are store in consecutive memory locations. The cap function returns the capacity, which is the number of consecutive memory allocations that have been reserved.  Capacity is different than length, which is the current number of elements in the slice.  When the length reaches the capacity, there is no more room to add elements, so Go will create a new slice with a bigger capacity and copy the original slice's values.
+
+When Go needs to increase the capacity, it will double the size if the capacity is less than 1024, and it will increase 25% after that.
+
+The following program shows the difference between length and capacity.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    x := []int{1,2,3}
+    fmt.Println(len(x), cap(x)) // 3 3
+     x = append(x,4)
+    fmt.Println(len(x), cap(x)) // 4 6
+    x = append(x,5,6)
+    fmt.Println(len(x), cap(x)) // 6 6
+    x = append(x,7)
+    fmt.Println(len(x), cap(x)) // 7 12
+
+}
+```
+
+After the slice initialization, both the length and the capacity are the same, 3.  Since length reached the capacity, when we add a value to the slice, the capacity needs to be increased.  Following the rules explained below, the capacity is doubled, so now the length is 4, and the capacity is 6.  After adding two more elements to the slice, the length and the capacity are 6.  At this point, again, the length reached the capacity. When we add another element, the capacity needs to be increased (doubled), so the last Println will display 7 for the length and 12 for the capacity.
+
+##  make
+
+You can define the initial length and optionally the capacity using the make function.
+
+```go
+x := make([]int, 10)
+y := make([]int,10, 15)
+```
+
+The first line creates a slice with a length and capacity of 10.  The second line creates a slice with a length of 10 and a capacity of 15.
+
+## Slicing
+
+You can create a new slice from an existing one with slice_name[start:end].
+
+```go
+    x := []int{1,2,3,4,5,6}
+    y := x[2:4]
+    fmt.Println(y) //  [3, 4]
+```
+
+In the example above, x[2:4] will return a slice from position 2 until position3 of x.  The ending offset in [start:end] is not included.
+
+Notice that slices created with slicing share the memory with the original slice, so if you make any changes in one of the slices, the changes will be reflected on the other.
+
+```go
+    x := []int{1,2,3,4,5,6}
+    y := x[2:4]
+    fmt.Println(y) //  [3, 4]
+    x[3] = 40
+    fmt.Println(x) // [1 2 3 40 5 6]
+    fmt.Println(y) // [3 40]
+    y[0] = 30
+    fmt.Println(x) // [1 2 30 40 5 6]
+    fmt.Println(y) // [30 40]
+```
+
+If you need to create a slice that does not share the memory with the original slice,  use the copy function.  If you modify the previous example, replacing the line y := x[2:4] with lines y := make([]int,2) and copy(y,x[2:4]), now y is independent of x, and the changes on one slice do not affect the other.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    x := []int{1,2,3,4,5,6}
+    y := make([]int,2)
+    copy(y,x[2:4])
+    fmt.Println(y) //  [3 4]
+    x[3] = 40
+    fmt.Println(x) // [1 2 3 40 5 6]
+    fmt.Println(y) // [3 4]
+    y[0] = 30
+    fmt.Println(x) // [1 2 3 40 5 6]
+    fmt.Println(y) // [30 4]
+}
+```
+
+# Maps
+
+Use maps when you need to associate one value with another.  Maps are key-value pairs.  You can declare a map using map[key_type]value_type.
+
+```go
+    numbers := map[string]int{}
+    numbers["one"] = 1
+    numbers["two"] = 2
+    numbers["three"] = 3
+```
+
+Also, you can assign values when declaring the map.
+
+```go
+numbers := map[string]int{"one": 1, "two":  2, "three": 3}
+```
+
+If you know how many pairs your map has, you can declare the map using the make function.
+
+```go
+numbers := make(map[string]int,5)
+```
+
+The previous example creates a map with a default size of 5.
+
+If you access a non-existing key, it will return the zero value, for example.
+
+```go
+    numbers := make(map[string]int,3)
+    numbers["one"] = 1
+    numbers["two"] = 2
+    numbers["three"] = 3
+    
+    fmt.Println(numbers["two"]) // 2
+    fmt.Println(numbers["four"]) // 0
+```
+
+Since there is no element with the "four" key, zero is displayed if you try to access the map using this key.  There are times when you need to know if the key didn't exist or if the value was zero.  In these cases, you can use the comma ok idiom.
+
+```go
+    numbers := map[string]int{}
+    numbers["one"] = 1
+    numbers["two"] = 2
+    numbers["three"] = 3
+    
+    value, ok := numbers["four"]
+    fmt.Println(value, ok) // 0 false
+```
+Println displays 0 false.  The ok variable is true if the key exists or false if it doesn't.
+
+## delete
+
+You can delete an element from the map using the delete function.  The delete function takes two parameters:  the map and the key to delete.
+
+```go
+    numbers := map[string]int{}
+    numbers["one"] = 1
+    numbers["two"] = 2
+    numbers["three"] = 3
+    delete(numbers, "two")
+    fmt.Println(numbers) // map[one:1 three:3]
+```
+
+In the example above, we deleted the element with the key "two."
