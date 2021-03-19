@@ -28,6 +28,7 @@
   - [Slicing](#slicing)
 - [Maps](#maps)
   - [delete](#delete)
+- [Structs](#structs)
 # Go Programming Language
 
 # Setting up Go
@@ -859,3 +860,61 @@ You can delete an element from the map using the delete function.  The delete fu
 ```
 
 In the example above, we deleted the element with the key "two."
+
+# Structs
+
+Use a struct when you have related data that needs to be group together. The example below shows the syntax to declare a struct in Go.
+
+```go
+type car struct {
+    year int
+    make string
+    model string
+}
+```
+
+Here, we declared a struct named car that has three variables.
+
+```go
+    type car struct {
+        year  int
+        make  string
+        model string
+    }
+
+    var car1 car
+    car2 := car{2020, "Infinity", "Q50"}
+    car3 := car{
+        model: "Altima",
+        make: "Nissan",
+        year: 2017,
+    }
+    
+
+    car1.year = 2018
+    car1.make = "Ford"
+    car1.model = "Explorer"
+
+    fmt.Println(car1) // {2018 Ford Explorer}
+    fmt.Println(car2) // {2020 Infinity Q50}
+    fmt.Println(car3) // {2017 Nissan Altima}
+```
+
+The previous example shows how to define a struct type and several ways to declare and initialize the struct's variables.
+
+There is another way to declare a struct named anonymous struct, shown in the example below.
+
+```go
+    car1 := struct {
+        year  int
+        make  string
+        model string
+    }{
+        model: "Altima",
+        make:  "Nissan",
+        year:  2017,
+    }
+
+    fmt.Println(car1) // {2017 Nissan Altima}
+```
+
