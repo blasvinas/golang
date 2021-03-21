@@ -29,6 +29,9 @@
 - [Maps](#maps)
   - [delete](#delete)
 - [Structs](#structs)
+- [if](#if)
+- [for](#for)
+- [switch](#switch)
 # Go Programming Language
 
 # Setting up Go
@@ -916,5 +919,214 @@ There is another way to declare a struct named anonymous struct, shown in the ex
     }
 
     fmt.Println(car1) // {2017 Nissan Altima}
+```
+
+# if
+
+The if statement in Go is similar to other languages.  One difference is that Go does not use parenthesis around the condition.
+
+```go
+	grade := 85
+	if grade >= 90 {
+		fmt.Println("A")
+	} else if grade >= 80 {
+		fmt.Println("B")
+	} else if grade >= 70 {
+		fmt.Println("C")
+	} else if grade >= 60 {
+		fmt.Println("D")
+	} else {
+		fmt.Println("F")
+	}
+```
+
+If you  want a variable to be local just to the if stament you can declare it in the if stament as shown below.
+
+```go
+	if grade := 85; grade >= 90 {
+		fmt.Println("A")
+	} else if grade >= 80 {
+		fmt.Println("B")
+	} else if grade >= 70 {
+		fmt.Println("C")
+	} else if grade >= 60 {
+		fmt.Println("D")
+	} else {
+		fmt.Println("F")
+	}
+    // fmt.Println(grade). Error: grade is not defined.
+```
+If you uncomment the last line, the program won't compile becuase grade is not defined. 
+
+# for
+
+In Go, for is the only loop statement. Go does not support while or do-while like other languages.  However, you can use the for statement in different ways that accomplish the same results than the missing loop statements.
+
+The first loop statement that we are going to check is the c-style for.  See example below.
+
+```go
+	for i := 0; i < 5; i++ {
+		fmt.Println(i)
+	}
+```
+
+The previous example will print the numbers from 0 to 4.  Notice that there are not parenthesis.
+
+If you simulate  the behaviour of a while loop with a confition-only for loop.  The next lines of code produce the same results that the previious example.
+
+```go
+	i := 0
+	for i < 5 {
+		fmt.Println(i)
+		i++
+	}
+```
+
+If you use for without any condition, you create a infinite loop.
+```go
+	for {
+		fmt.Println("this will run forever!")
+	}
+```
+
+You can use the break statement to end a infinite for for, or any  for loop.
+
+```go
+	i:=1
+	for {
+		fmt.Println("this will run forever!")
+		i++
+		if i > 10 {
+			break
+		}
+	}
+```
+
+Also, you can use the continue stament if you want to skip the rest of the body in the for loop and continue with the next iteration.  The next example print the odd numbers between 0 and 10.
+
+```go
+	for i := 0; i <= 10; i++ {
+		if i%2 == 0 {
+			continue
+		}
+		fmt.Println(i)
+	}
+```
+
+One more way of the for statement is the for-range statement.  The for-range statement is use to iterate over collections like arrays, slices, maps, etc.  The next example iterate over a slice, in this  case  range returns the index and the value.
+
+```go
+	x := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+	for i, v := range x {
+		fmt.Println(i, v)
+	}
+```
+
+The lines above print 2 numbers per line.  The first number is the index and the second is the value.
+
+```shell
+0 1
+1 2
+2 3
+3 4
+4 5
+5 6
+6 7
+7 8
+8 9
+```
+
+If you only need the value, use an undersore instead of i as follow.
+
+```go
+	for _, v := range x {
+		fmt.Println(v)
+	}
+```
+
+The following example iterate over a map.  In this case range returns the key and the value.
+
+```go
+	numbers := map[string]int{"one": 1, "two": 2, "three": 3}
+
+	for k, v := range numbers {
+		fmt.Println(k, v)
+	}
+```
+The output is similar to the one  below.
+
+```shell
+one 1
+two 2
+three 3
+```
+
+If you are interested only on the values, use an underscore instead of k.
+
+```go
+	numbers := map[string]int{"one": 1, "two": 2, "three": 3}
+
+	for _, v := range numbers {
+		fmt.Println(v)
+	}
+```
+
+If you need only the key, you can leave the second variable off.
+
+```go
+	numbers := map[string]int{"one": 1, "two": 2, "three": 3}
+
+	for k := range numbers {
+		fmt.Println(v)
+	}
+```
+
+# switch
+
+Sometimes, when you have several if-else if statements, it is better to use a switch statement.
+
+```go
+ dayOfWeek := 6
+ switch dayOfWeek {
+ case 1:
+ fmt.Println("Monday")
+ case 2:
+ fmt.Println("Tuesday")
+ case 3:
+ fmt.Println("Wednesday")
+ case 4:
+ fmt.Println("Thursday")
+ case 5, 6, 7:
+ fmt.Println("Weekend!!!")
+ default:
+ fmt.Println("Invalid day")
+ }
+```
+
+As you can see in the previous example, in Go, there is no need to use the break statement since switch statements do not fall through in Go. You can still use break if you want to exit early from a case.
+
+You can combine multiple matches, separating them with commas, like the case for the Weekend in the previous example.
+
+Also, cases can use any logical tests, as shown below.
+
+```go
+ dayOfWeek := 6
+ switch {
+ case dayOfWeek > 5:
+ fmt.Println("I am freeeee!!!!!")
+ case dayOfWeek >= 4:
+ fmt.Println("I can see the light at the end of the tunnel")
+ case dayOfWeek >= 1:
+ fmt.Println("is it Friday yet?")
+ }
+```
+
+In the previous example, you can declare the dayOfWeek variable inside the switch as shown next.
+
+```
+switch dayOfWeek := 6; {
+ ...
+}
 ```
 
