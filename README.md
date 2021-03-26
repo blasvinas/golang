@@ -37,7 +37,7 @@
   - [Returning Multiple Values](#returning-multiple-values)
   - [Functions as Values](#functions-as-values)
   - [Closures](#closures)
-- [defer](#defer)
+  - [defer](#defer)
 # Go Programming Language
 
 # Setting up Go
@@ -1385,7 +1385,7 @@ func main() {
 
 In the previous example, the seq() function returns a closure that increments an integer and returns it.  Notice that the closure has access to i which is declared in the outer function.  When we assign seq() to nextNumber1, nextNumber1 captures the value of the variable i.  nextNumber1 will remember the previous value of i and increment it.  When we assign seq() to nextNumber2, it will capture its own i value.
 
-# defer
+## defer
 
 Usually, you use defer when you need to release resources like files, network connections, database connections, etc.  When you call a function using defer, it won't be executed until the calling function ends.  In the example below, the closeDB function will be called when the addRecord() function exits.
 
