@@ -38,6 +38,7 @@
   - [Functions as Values](#functions-as-values)
   - [Closures](#closures)
   - [defer](#defer)
+- [Pointers](#pointers)
 # Go Programming Language
 
 # Setting up Go
@@ -1432,3 +1433,6 @@ func main() {
     addRecord()
 }
 ```
+
+# Pointers
+
