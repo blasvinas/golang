@@ -32,6 +32,12 @@
 - [if](#if)
 - [for](#for)
 - [switch](#switch)
+- [Functions](#functions)
+  - [Variadic Parameters](#variadic-parameters)
+  - [Returning Multiple Values](#returning-multiple-values)
+  - [Functions as Values](#functions-as-values)
+  - [Closures](#closures)
+- [defer](#defer)
 # Go Programming Language
 
 # Setting up Go
@@ -1130,3 +1136,299 @@ switch dayOfWeek := 6; {
 }
 ```
 
+# Functions
+
+Below is the syntax to declare a function in Go.
+
+```go
+    func name(arguments) return_type {
+        ...
+        return ...
+    }
+```
+
+The example below shows how to declare and call a function.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    x := sum(8,6)
+    fmt.Println(x) // 14
+}
+
+func sum(a int, b int) int {
+    return a + b
+}
+```
+
+In the previous example, we declare a function named sum, which takes two integer parameters and returns an integer with the two numbers' addition. 
+
+Since the parameters, a and b, have the same type, you could have declared the function as follow.
+
+```go
+func sum(a , b int) int {
+    return a + b
+}
+```
+
+Unlike other languages, Go does not have neither named nor optional parameters.
+
+## Variadic Parameters
+
+Continuing with the previous example, what if we do not know how many numbers we need to add?  In those cases, we can use variadic parameters, as shown below.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    x := sum(8, 6)
+    y := sum(6,5,9)
+    z := sum(7,5,3,4)
+    fmt.Println(x) // 14
+    fmt.Println(y) // 20
+    fmt.Println(z) // 19
+    
+}
+
+func sum(a, b int, numbers ...int) int {
+    sum := a + b
+    for _, v := range numbers {
+        sum += v
+    }
+    return sum
+}
+```
+
+As you can see in the example, you can define a variable number of parameters using the syntax ...type.  Now you can call sum with a different number of parameters as shown in the example.
+
+## Returning Multiple Values
+
+Functions in Go can return multiple values.  Below is the syntax.
+
+```go
+    func name(arguments) (return_type1, return_type2, ...) {
+        ...
+        return value1, value2, ...
+    }
+```
+
+The function in the following example returns the addition and the subtraction of two integers.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    x, y := addAndSubtract(8, 6)
+
+    fmt.Println(x) // 14
+    fmt.Println(y) // 2
+}
+
+func addAndSubtract(a, b int) (int, int) {
+    sum := a + b
+    diff := a - b
+    return sum, diff
+}
+```
+
+You can ignore a return value using an underscore.  In the previous example, if you want to ignore the value for the sum, you can call the function as follow.
+
+```go
+_,y := addAndSubtract(8, 6)
+```
+
+You can name the return the return values as shown below.
+
+```go
+func addAndSubtract(a, b int) (sum int, diff int) {
+    sum = a + b
+    diff = a - b
+    return sum, diff
+}
+```
+
+When you do that, you do not need to declare them inside the function, and they will be initialized to the zero value.
+
+## Functions as Values
+
+In Go,  functions are similar to other values and you can use them in collections or pass them to other functions as long as the signature of the function match.  The signature of a function is the combination of the type of the parameters and the return value.
+
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    ops := []func(int, int) int{add, sub, mul, div}
+
+    for _, op := range ops {
+        fmt.Println(op(6, 3))
+    }
+}
+
+func add(a int, b int) int {
+    return a + b
+}
+
+func sub(a int, b int) int {
+    return a - b
+}
+
+func mul(a int, b int) int {
+    return a * b
+}
+
+func div(a int, b int) int {
+    if b != 0 {
+        return a / b
+    }
+    return 0
+}
+```
+
+This program creates a list of functions that take two integers as parameters and return an integer value.  Then, the program iterates over the list and call each function.
+
+You can create a type with the function signature, so in the previous program, you can declare the list of functions as follow.
+
+```go
+    type opFunc func(int, int) int
+    ops := []opFunc{add, sub, mul, div}
+```
+
+
+## Closures
+
+A closure is a function declared inside another function that can access the variables of the outer function.  Closures are useful when they are passed to other functions or when they are returned by other functions. Below is an example that uses closures.
+
+```go
+package main
+
+import (
+    "fmt"
+    "sort"
+)
+
+func main() {
+    type Employee struct {
+        name   string
+        salary float64
+    }
+
+    employees := []Employee{
+        {"John", 50000},
+        {"Nancy", 75000},
+        {"Mary", 45000},
+        {"Fred", 70000},
+    }
+
+    fmt.Println(employees) // [{John 50000} {Nancy 75000} {Mary 45000} {Fred 70000}]
+
+    //Sort by salaries
+    sort.Slice(employees, func(i int, j int) bool {
+        return employees[i].salary < employees[j].salary
+    })
+    fmt.Println(employees) // [{Mary 45000} {John 50000} {Fred 70000} {Nancy 75000}]
+    
+    // Sort by names
+    sort.Slice(employees, func(i int, j int) bool {
+        return employees[i].name < employees[j].name
+    })
+    fmt.Println(employees) // [{Fred 70000} {John 50000} {Mary 45000} {Nancy 75000}]
+}
+```
+
+The sort.Slice function takes a slice and a closure with the logic to compare the values and sort the slice.  As you can see, the closure has access to the employees slice, which is in the outer function.
+
+The following example shows a function that returns a closure.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func seq() func() int {
+    i := 0
+    return func() int {
+        i++
+        return i
+    }
+}
+
+func main() {
+    nextNumber1 := seq()
+    fmt.Println(nextNumber1()) // 1
+    fmt.Println(nextNumber1()) // 2
+    fmt.Println(nextNumber1()) // 3
+    
+    nextNumber2 := seq()
+    fmt.Println(nextNumber2()) // 1
+
+
+}
+```
+
+In the previous example, the seq() function returns a closure that increments an integer and returns it.  Notice that the closure has access to i which is declared in the outer function.  When we assign seq() to nextNumber1, nextNumber1 captures the value of the variable i.  nextNumber1 will remember the previous value of i and increment it.  When we assign seq() to nextNumber2, it will capture its own i value.
+
+# defer
+
+Usually, you use defer when you need to release resources like files, network connections, database connections, etc.  When you call a function using defer, it won't be executed until the calling function ends.  In the example below, the closeDB function will be called when the addRecord() function exits.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func closeDB() {
+    fmt.Println("Closing the database")
+}
+
+func addRecord() {
+    defer closeDB()
+    fmt.Println("Opening the database")
+    fmt.Println("Add a new record")
+}
+
+func main() {
+    addRecord()
+}
+```
+
+Instead of having a closeDB() function, you can use a closure, as shown below.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func addRecord() {
+    defer func() {
+        fmt.Println("Closing the database")
+    }()
+    fmt.Println("Opening the database")
+    fmt.Println("Add a new record")
+}
+
+func main() {
+    addRecord()
+}
+```
