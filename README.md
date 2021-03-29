@@ -1436,3 +1436,45 @@ func main() {
 
 # Pointers
 
+A pointer contains the address where a variable is stored.  You declare a variable of pointer type using a * before the type.  To get the address of a variable, you can use the address operator, &.  To get the content of the address referenced by a pointer, use the indirection operator, *.
+
+
+```go
+    var p *int  // Pointer to an integer
+    x := 5
+
+    p = &x // assign to p the location in memory of x
+    fmt.Println(p). // Something similar to this:  0xc0000be010
+    fmt.Println(*p) // 5
+```
+
+In Go, parameters a passed by value, which means that the parameter is a copy of the original value,  so if you modify the parameter inside the function, that won't affect the original value.  This is shown with update1 in the example below. After calling update1, the value of x is still the same, 5.  If you need to change the original value, you need to pass a reference as a parameter, as shown with update2.   After calling update2, the value of x will change to 10.
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func update1(x int) {
+    x = 10
+}
+
+func update2(x *int) {
+    *x = 10
+}
+
+func main() {
+    x := 5
+    update1(x)
+    fmt.Println(x) // 5
+
+    update2(&x)
+    fmt.Println(x) // 10
+
+}
+```
+
+The zero value of pointers is nil, which means no value has been assigned to a variable yet.
+
