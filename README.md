@@ -39,6 +39,7 @@
   - [Closures](#closures)
   - [defer](#defer)
 - [Pointers](#pointers)
+- [Methods](#methods)
 # Go Programming Language
 
 # Setting up Go
@@ -1477,4 +1478,124 @@ func main() {
 ```
 
 The zero value of pointers is nil, which means no value has been assigned to a variable yet.
+
+# Methods
+
+Methods are similar to functions, but they work on user-defined types.  The followinfg example show a Employee strunct and a methond named Info() to dispplay the employee information.
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type Employee struct {
+	firstName string
+	lastName  string
+	salary    float64
+}
+
+func (e Employee) Info() string {
+	return fmt.Sprintf("%s %s %f", e.firstName, e.lastName, e.salary)
+}
+
+func main() {
+	e := Employee{
+		firstName: "Joe",
+		lastName:  "Doe",
+		salary:    50000,
+	}
+
+	fmt.Println(e.Info())
+}
+```
+
+As you can see the method Info() looks very similar to a fuction with the only difference being the receiver.  The receiver appers after func and before the name of the method.  In the example above the receiver is (e Employee).  The receiver is what identify that the Info() method work on the Employee type.
+
+Let's add the following method to increase the employee's salary.
+
+```go
+func (e Employee) IncreaseSalary(amount float64) {
+	e.salary += amount
+}
+```
+
+Add the line to call IncreaseSalary in main(), as shown below.
+
+```go
+func main() {
+	e := Employee{
+		firstName: "Joe",
+		lastName:  "Doe",
+		salary:    50000,
+	}
+	fmt.Println(e.Info())
+
+	e.IncreaseSalary(20000)
+	fmt.Println(e.Info())
+}
+```
+
+If we run this program the we get the following output.
+
+```shell
+Joe Doe 50000.000000
+Joe Doe 50000.000000
+```
+
+So,  the salary is still 50000 instead of 70000.  The reason, as explained when we discussed pointers, is that the receiver in IncreaseSalary is passed by value, which means that the method makes a copy of the struct and changes the copy without affecting the original struct.  If we need to change the orinal struct, we need to declare the recever as a pointer as shown below.
+
+```go
+func (e *Employee) IncreaseSalary(amount float64) {
+	e.salary += amount
+}
+```
+
+Now if you execute the program again you get the following output.
+
+```shell
+Joe Doe 50000.000000
+Joe Doe 70000.000000
+```
+
+Below is the complete program.
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type Employee struct {
+	firstName string
+	lastName  string
+	salary    float64
+}
+
+func (e *Employee) Info() string {
+	return fmt.Sprintf("%s %s %f", e.firstName, e.lastName, e.salary)
+}
+
+func (e *Employee) IncreaseSalary(amount float64) {
+	e.salary += amount
+}
+
+func main() {
+	e := Employee{
+		firstName: "Joe",
+		lastName:  "Doe",
+		salary:    50000,
+	}
+	fmt.Println(e.Info())
+
+	e.IncreaseSalary(20000)
+	fmt.Println(e.Info())
+}
+```
+
+Notice that in main() when we call SalaryIncrease we use the variable e which is a value type instead of a pointer,  Go automatically converts it to a pointer type.  In this case, e.IncreaseSalary is converted to (&e).IncreaseSalary.
+
+Also, notice that we change the Info() method to take a pointer for the receive even though it does not need to change the value.  Go best practices suggest that if you change any of the methods to take a pointer receiver, change all methods to use pointer receiver for consistency.
 
