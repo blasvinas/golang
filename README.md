@@ -40,6 +40,8 @@
   - [defer](#defer)
 - [Pointers](#pointers)
 - [Methods](#methods)
+- [iota](#iota)
+- [Composition](#composition)
 # Go Programming Language
 
 # Setting up Go
@@ -1599,3 +1601,70 @@ Notice that in main() when we call SalaryIncrease we use the variable e which is
 
 Also, notice that we change the Info() method to take a pointer for the receive even though it does not need to change the value.  Go best practices suggest that if you change any of the methods to take a pointer receiver, change all methods to use pointer receiver for consistency.
 
+
+# iota
+
+You can define a block of constants using iota as shown the the program below.  iota give the first constant the value of zero and incremewnt the value by one for each subsequent constant.  In this exampple we do not care about the value of zero, so we use _ to ignore it.
+
+```go
+	type DaysOfWeek int
+
+	const (
+		_ DaysOfWeek = iota
+		Monday		// 1
+		Tuesday		// 2
+		Wednesday	// 3
+		Thursday	// 4
+		Friday		// 5
+		Saturday	// 6
+		Sunday		// 7
+	)
+	
+	fmt.Println(Sunday). // 7
+```
+
+# Composition
+
+Go favors composition over inheritance.  The following program shows how to use composition.
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type Person struct {
+	firstName string
+	lastName  string
+}
+
+func (p Person) PersonInfo() string {
+	return fmt.Sprintf("Name: %s %s.", p.firstName, p.lastName)
+}
+
+type Employee struct {
+	Person
+	salary float64
+}
+
+func (e Employee) SalaryInfo() string {
+	return fmt.Sprintf("Salary %f", e.salary)
+}
+
+func main() {
+
+	e := Employee{
+		Person: Person{
+			firstName: "Joe",
+			lastName:  "Doe",
+		},
+		salary: 50000,
+	}
+
+	fmt.Println(e.PersonInfo())
+	fmt.Println(e.SalaryInfo())
+}
+```
+
+Note that Employee contains a field of type Employee.  All the fields and methods of Person can be accessed by Employee.
