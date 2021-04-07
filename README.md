@@ -42,6 +42,7 @@
 - [Methods](#methods)
 - [iota](#iota)
 - [Composition](#composition)
+- [Interfaces](#interfaces)
 # Go Programming Language
 
 # Setting up Go
@@ -1668,3 +1669,65 @@ func main() {
 ```
 
 Note that Employee contains a field of type Employee.  All the fields and methods of Person can be accessed by Employee.
+
+# Interfaces
+
+An interface is an abstract type which define a list of methods that must be implemented by a concrete type that meet the interface. In Go the name of the interface usually ends with "er". The methods defined by an interface are called the method set of the interface.
+
+```go
+type Shaper Interface {
+	Area() float64
+}
+```
+
+In Go interfaces are implemented implicity. A concrete type does not declare that it impolements then interface.  If the concrete type contains all the methods defined by the interface, the concrete type impplements the interface.  If a concrete type implements an interface, it can be assigned to a variable of the type of the interface.
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type Shaper interface {
+	Area() float64
+}
+
+type Square struct {
+	size float64
+}
+
+func (s Square) Area() float64 {
+	return s.size * s.size
+}
+
+type Rectangle struct {
+	length float64
+	width  float64
+}
+
+func (r Rectangle) Perimeter() float64 {
+	return (2 * r.length) + (2 * r.width)
+}
+
+func main() {
+	s := Square{
+		size: 5,
+	}
+
+	r := Rectangle{
+		length: 10,
+		width:  5,
+	}
+
+	var i Shaper = s
+
+	fmt.Println(i.Area())
+	
+	i = r // cannot use r (type Rectangle) as type Shaper in assignment: Rectangle does not implement Shaper (missing Area method)
+	fmt.Println(i.Perimeter())
+
+}
+```
+
+In the previous example, the Square type implements the interface becuase it define the Area method, so it can be assigned to a variable of the interface type Shaper as you can see in the main() function whrn we assign the Square variable s to the Shaper interface variable i.  When we try to do the same with the Rectangle variable, we get an error because Rectangle does not implement the interface since it does not define the Area() method.
