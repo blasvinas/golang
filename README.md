@@ -43,6 +43,9 @@
 - [iota](#iota)
 - [Composition](#composition)
 - [Interfaces](#interfaces)
+  - [The Empty Interface](#the-empty-interface)
+  - [Type Assertions](#type-assertions)
+  - [Type Switches](#type-switches)
 # Go Programming Language
 
 # Setting up Go
@@ -1730,4 +1733,134 @@ func main() {
 }
 ```
 
-In the previous example, the Square type implements the interface becuase it define the Area method, so it can be assigned to a variable of the interface type Shaper as you can see in the main() function whrn we assign the Square variable s to the Shaper interface variable i.  When we try to do the same with the Rectangle variable, we get an error because Rectangle does not implement the interface since it does not define the Area() method.
+In the previous example, the Square type implements the interface becuase it define the Area method, so it can be assigned to a variable of the interface type Shaper as you can see in the main() function when we assign the Square variable s to the Shaper interface variable i.  When we try to do the same with the Rectangle variable, we get an error because Rectangle does not implement the interface since it does not define the Area() method.
+
+## The Empty Interface
+
+An empty interface type can store a type that impements zero or more methods.   In other words an empty interface can store a value of any type.
+
+```go
+	var i interface{}
+	
+	i = 5
+	fmt.Println(i)
+	
+	i = "Hello World"
+	fmt.Println(i)
+	
+	i = 7.8
+	fmt.Println(i)
+	
+	i = []int {1,2,3}
+	fmt.Println(i)
+```
+
+The variable i is an empty interface and as you can see in the example, it can store any type.
+
+## Type Assertions
+
+A type assertions check if a interface has a specific concrete type.  The syntax is interface.(type).
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type Shaper interface {
+	Area() float64
+}
+
+type Square struct {
+	size float64
+}
+
+func (s Square) Area() float64 {
+	return s.size * s.size
+}
+
+type Rectangle struct {
+	length float64
+	width  float64
+}
+
+func (r Rectangle) Perimeter() float64 {
+	return (2 * r.length) + (2 * r.width)
+}
+
+func main() {
+	s := Square{
+		size: 5,
+	}
+
+	r := Rectangle{
+		length: 10,
+		width:  5,
+	}
+
+	var i interface{}
+
+	i = s
+
+	i2, ok := i.(Square)
+
+	if !ok {
+		fmt.Println("i2 does not have a Square type")
+	} else {
+		fmt.Println(i2.Area())
+	}
+
+	i = r
+	i3, ok := i.(Square)
+
+	if !ok {
+		fmt.Println("i3 does not have a Square type")
+	} else {
+		fmt.Println(i3.Area())
+	}
+}
+```
+
+In this example the first type assertion i.(Square) is right, and i2 is of type Square, but the second type assertion is wrong becuase i is storing r, which is not the type Square, i3 is not of type Square and a message is displayed.
+
+
+## Type Switches
+
+You can use a type switch to verify the type of the interface as sown below.
+
+```go
+package main
+
+import "fmt"
+
+func checkType(i interface{}) {
+	switch j := i.(type) {
+	case nil:
+		fmt.Println("i is nil")
+	case int:
+		fmt.Println("i is int")
+		fmt.Println(j)
+	case float64:
+		fmt.Println("i is float64")
+		fmt.Println(j)
+
+	case string:
+		fmt.Println("i is string")
+		fmt.Println(j)
+	}
+}
+
+func main() {
+	x := 6.3
+	checkType(x)
+}
+```
+
+This program will display:
+
+```shell
+i is float64
+6.3
+```
+
