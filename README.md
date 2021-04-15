@@ -46,6 +46,9 @@
   - [The Empty Interface](#the-empty-interface)
   - [Type Assertions](#type-assertions)
   - [Type Switches](#type-switches)
+- [Errors](#errors)
+  - [How to Handle Errors](#how-to-handle-errors)
+  - [panic and recover](#panic-and-recover)
 # Go Programming Language
 
 # Setting up Go
@@ -1487,43 +1490,43 @@ The zero value of pointers is nil, which means no value has been assigned to a v
 
 # Methods
 
-Methods are similar to functions, but they work on user-defined types.  The followinfg example show a Employee strunct and a methond named Info() to dispplay the employee information.
+Methods are similar to functions, but they work on user-defined types.  The following example shows an Employee struct and a method named Info() to display the employee information.
 
 ```go
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 type Employee struct {
-	firstName string
-	lastName  string
-	salary    float64
+    firstName string
+    lastName  string
+    salary    float64
 }
 
 func (e Employee) Info() string {
-	return fmt.Sprintf("%s %s %f", e.firstName, e.lastName, e.salary)
+    return fmt.Sprintf("%s %s %f", e.firstName, e.lastName, e.salary)
 }
 
 func main() {
-	e := Employee{
-		firstName: "Joe",
-		lastName:  "Doe",
-		salary:    50000,
-	}
+    e := Employee{
+        firstName: "Joe",
+        lastName:  "Doe",
+        salary:    50000,
+    }
 
-	fmt.Println(e.Info())
+    fmt.Println(e.Info())
 }
 ```
 
-As you can see the method Info() looks very similar to a fuction with the only difference being the receiver.  The receiver appers after func and before the name of the method.  In the example above the receiver is (e Employee).  The receiver is what identify that the Info() method work on the Employee type.
+As you can see, the method Info() looks very similar to a function, with the only difference being the receiver.  The receiver appears after func and before the name of the method.  In the example above, the receiver is (e Employee).  The receiver is what identifies that the Info() method work on the Employee type.
 
 Let's add the following method to increase the employee's salary.
 
 ```go
 func (e Employee) IncreaseSalary(amount float64) {
-	e.salary += amount
+    e.salary += amount
 }
 ```
 
@@ -1531,34 +1534,34 @@ Add the line to call IncreaseSalary in main(), as shown below.
 
 ```go
 func main() {
-	e := Employee{
-		firstName: "Joe",
-		lastName:  "Doe",
-		salary:    50000,
-	}
-	fmt.Println(e.Info())
+    e := Employee{
+        firstName: "Joe",
+        lastName:  "Doe",
+        salary:    50000,
+    }
+    fmt.Println(e.Info())
 
-	e.IncreaseSalary(20000)
-	fmt.Println(e.Info())
+    e.IncreaseSalary(20000)
+    fmt.Println(e.Info())
 }
 ```
 
-If we run this program the we get the following output.
+If we run this program, we get the following output.
 
 ```shell
 Joe Doe 50000.000000
 Joe Doe 50000.000000
 ```
 
-So,  the salary is still 50000 instead of 70000.  The reason, as explained when we discussed pointers, is that the receiver in IncreaseSalary is passed by value, which means that the method makes a copy of the struct and changes the copy without affecting the original struct.  If we need to change the orinal struct, we need to declare the recever as a pointer as shown below.
+So,  the salary is still 50000 instead of 70000.  As explained when we discussed pointers, the reason is that the receiver in IncreaseSalary is passed by value, which means that the method makes a copy of the struct and changes the copy without affecting the original struct.  If we need to change the original struct, we need to declare the receiver as a pointer, as shown below.
 
 ```go
 func (e *Employee) IncreaseSalary(amount float64) {
-	e.salary += amount
+    e.salary += amount
 }
 ```
 
-Now if you execute the program again you get the following output.
+Now, if you execute the program again, you get the following output.
 
 ```shell
 Joe Doe 50000.000000
@@ -1571,60 +1574,60 @@ Below is the complete program.
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 type Employee struct {
-	firstName string
-	lastName  string
-	salary    float64
+    firstName string
+    lastName  string
+    salary    float64
 }
 
 func (e *Employee) Info() string {
-	return fmt.Sprintf("%s %s %f", e.firstName, e.lastName, e.salary)
+    return fmt.Sprintf("%s %s %f", e.firstName, e.lastName, e.salary)
 }
 
 func (e *Employee) IncreaseSalary(amount float64) {
-	e.salary += amount
+    e.salary += amount
 }
 
 func main() {
-	e := Employee{
-		firstName: "Joe",
-		lastName:  "Doe",
-		salary:    50000,
-	}
-	fmt.Println(e.Info())
+    e := Employee{
+        firstName: "Joe",
+        lastName:  "Doe",
+        salary:    50000,
+    }
+    fmt.Println(e.Info())
 
-	e.IncreaseSalary(20000)
-	fmt.Println(e.Info())
+    e.IncreaseSalary(20000)
+    fmt.Println(e.Info())
 }
 ```
 
-Notice that in main() when we call SalaryIncrease we use the variable e which is a value type instead of a pointer,  Go automatically converts it to a pointer type.  In this case, e.IncreaseSalary is converted to (&e).IncreaseSalary.
+Notice that in main(), when we call SalaryIncrease, we use the variable e, which is a value type instead of a pointer. Go automatically converts it to a pointer type.  In this case, e.IncreaseSalary is converted to (&e).IncreaseSalary.
 
-Also, notice that we change the Info() method to take a pointer for the receive even though it does not need to change the value.  Go best practices suggest that if you change any of the methods to take a pointer receiver, change all methods to use pointer receiver for consistency.
+Also, notice that we change the Info() method to take a pointer for the receiver even though it does not need to change the value.  Go best practices suggest that if you change any methods to take a pointer receiver, change all methods to use pointer receiver for consistency.
 
 
 # iota
 
-You can define a block of constants using iota as shown the the program below.  iota give the first constant the value of zero and incremewnt the value by one for each subsequent constant.  In this exampple we do not care about the value of zero, so we use _ to ignore it.
+You can define a block of constants using iota, as shown in the program below. Iota gives the first constant the value of zero and increments the value by one for each subsequent constant.  In this example, we do not care about the value of zero, so we use _ to ignore it.
 
 ```go
-	type DaysOfWeek int
+    type DaysOfWeek int
 
-	const (
-		_ DaysOfWeek = iota
-		Monday		// 1
-		Tuesday		// 2
-		Wednesday	// 3
-		Thursday	// 4
-		Friday		// 5
-		Saturday	// 6
-		Sunday		// 7
-	)
-	
-	fmt.Println(Sunday). // 7
+    const (
+        _ DaysOfWeek = iota
+        Monday      // 1
+        Tuesday     // 2
+        Wednesday   // 3
+        Thursday    // 4
+        Friday      // 5
+        Saturday    // 6
+        Sunday      // 7
+    )
+    
+    fmt.Println(Sunday). // 7
 ```
 
 # Composition
@@ -1635,39 +1638,39 @@ Go favors composition over inheritance.  The following program shows how to use 
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 type Person struct {
-	firstName string
-	lastName  string
+    firstName string
+    lastName  string
 }
 
 func (p Person) PersonInfo() string {
-	return fmt.Sprintf("Name: %s %s.", p.firstName, p.lastName)
+    return fmt.Sprintf("Name: %s %s.", p.firstName, p.lastName)
 }
 
 type Employee struct {
-	Person
-	salary float64
+    Person
+    salary float64
 }
 
 func (e Employee) SalaryInfo() string {
-	return fmt.Sprintf("Salary %f", e.salary)
+    return fmt.Sprintf("Salary %f", e.salary)
 }
 
 func main() {
 
-	e := Employee{
-		Person: Person{
-			firstName: "Joe",
-			lastName:  "Doe",
-		},
-		salary: 50000,
-	}
+    e := Employee{
+        Person: Person{
+            firstName: "Joe",
+            lastName:  "Doe",
+        },
+        salary: 50000,
+    }
 
-	fmt.Println(e.PersonInfo())
-	fmt.Println(e.SalaryInfo())
+    fmt.Println(e.PersonInfo())
+    fmt.Println(e.SalaryInfo())
 }
 ```
 
@@ -1675,159 +1678,159 @@ Note that Employee contains a field of type Employee.  All the fields and method
 
 # Interfaces
 
-An interface is an abstract type which define a list of methods that must be implemented by a concrete type that meet the interface. In Go the name of the interface usually ends with "er". The methods defined by an interface are called the method set of the interface.
+An interface is an abstract type that defines a list of methods that must be implemented by a concrete type that meets the interface. In Go, the name of the interface usually ends with "er." The methods defined by an interface are called the method set of the interface.
 
 ```go
 type Shaper Interface {
-	Area() float64
+    Area() float64
 }
 ```
 
-In Go interfaces are implemented implicity. A concrete type does not declare that it impolements then interface.  If the concrete type contains all the methods defined by the interface, the concrete type impplements the interface.  If a concrete type implements an interface, it can be assigned to a variable of the type of the interface.
+In Go, interfaces are implemented implicitly. A concrete type does not declare that it implements the interface.  If the concrete type contains all the interface methods, the concrete type implements the interface.  If a concrete type implements an interface, it can be assigned to a variable of the interface type.
 
 ```go
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 type Shaper interface {
-	Area() float64
+    Area() float64
 }
 
 type Square struct {
-	size float64
+    size float64
 }
 
 func (s Square) Area() float64 {
-	return s.size * s.size
+    return s.size * s.size
 }
 
 type Rectangle struct {
-	length float64
-	width  float64
+    length float64
+    width  float64
 }
 
 func (r Rectangle) Perimeter() float64 {
-	return (2 * r.length) + (2 * r.width)
+    return (2 * r.length) + (2 * r.width)
 }
 
 func main() {
-	s := Square{
-		size: 5,
-	}
+    s := Square{
+        size: 5,
+    }
 
-	r := Rectangle{
-		length: 10,
-		width:  5,
-	}
+    r := Rectangle{
+        length: 10,
+        width:  5,
+    }
 
-	var i Shaper = s
+    var i Shaper = s
 
-	fmt.Println(i.Area())
-	
-	i = r // cannot use r (type Rectangle) as type Shaper in assignment: Rectangle does not implement Shaper (missing Area method)
-	fmt.Println(i.Perimeter())
+    fmt.Println(i.Area())
+    
+    i = r // cannot use r (type Rectangle) as type Shaper in assignment: Rectangle does not implement Shaper (missing Area method)
+    fmt.Println(i.Perimeter())
 
 }
 ```
 
-In the previous example, the Square type implements the interface becuase it define the Area method, so it can be assigned to a variable of the interface type Shaper as you can see in the main() function when we assign the Square variable s to the Shaper interface variable i.  When we try to do the same with the Rectangle variable, we get an error because Rectangle does not implement the interface since it does not define the Area() method.
+In the previous example, the Square type implements the interface because it defines the Area method. Square can be assigned to a variable of the interface type Shaper. In the main() function above,  the Square variable s  is assigned to the Shaper interface variable i.  When we try to do the same with the Rectangle variable, we get an error because Rectangle does not implement the interface since it does not define the Area() method.
 
 ## The Empty Interface
 
-An empty interface type can store a type that impements zero or more methods.   In other words an empty interface can store a value of any type.
+An empty interface type can store a type that implements zero or more methods.   In other words, an empty interface can store a value of any type.
 
 ```go
-	var i interface{}
-	
-	i = 5
-	fmt.Println(i)
-	
-	i = "Hello World"
-	fmt.Println(i)
-	
-	i = 7.8
-	fmt.Println(i)
-	
-	i = []int {1,2,3}
-	fmt.Println(i)
+    var i interface{}
+    
+    i = 5
+    fmt.Println(i)
+    
+    i = "Hello World"
+    fmt.Println(i)
+    
+    i = 7.8
+    fmt.Println(i)
+    
+    i = []int {1,2,3}
+    fmt.Println(i)
 ```
 
-The variable i is an empty interface and as you can see in the example, it can store any type.
+The variable i is an empty interface, and as you can see in the example, it can store any type.
 
 ## Type Assertions
 
-A type assertions check if a interface has a specific concrete type.  The syntax is interface.(type).
+A type assertions check if an interface has a specific concrete type.  The syntax is interface.(type).
 
 ```go
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 type Shaper interface {
-	Area() float64
+    Area() float64
 }
 
 type Square struct {
-	size float64
+    size float64
 }
 
 func (s Square) Area() float64 {
-	return s.size * s.size
+    return s.size * s.size
 }
 
 type Rectangle struct {
-	length float64
-	width  float64
+    length float64
+    width  float64
 }
 
 func (r Rectangle) Perimeter() float64 {
-	return (2 * r.length) + (2 * r.width)
+    return (2 * r.length) + (2 * r.width)
 }
 
 func main() {
-	s := Square{
-		size: 5,
-	}
+    s := Square{
+        size: 5,
+    }
 
-	r := Rectangle{
-		length: 10,
-		width:  5,
-	}
+    r := Rectangle{
+        length: 10,
+        width:  5,
+    }
 
-	var i interface{}
+    var i interface{}
 
-	i = s
+    i = s
 
-	i2, ok := i.(Square)
+    i2, ok := i.(Square)
 
-	if !ok {
-		fmt.Println("i2 does not have a Square type")
-	} else {
-		fmt.Println(i2.Area())
-	}
+    if !ok {
+        fmt.Println("i2 does not have a Square type")
+    } else {
+        fmt.Println(i2.Area())
+    }
 
-	i = r
-	i3, ok := i.(Square)
+    i = r
+    i3, ok := i.(Square)
 
-	if !ok {
-		fmt.Println("i3 does not have a Square type")
-	} else {
-		fmt.Println(i3.Area())
-	}
+    if !ok {
+        fmt.Println("i3 does not have a Square type")
+    } else {
+        fmt.Println(i3.Area())
+    }
 }
 ```
 
-In this example the first type assertion i.(Square) is right, and i2 is of type Square, but the second type assertion is wrong becuase i is storing r, which is not the type Square, i3 is not of type Square and a message is displayed.
+In this example, the first type assertion i.(Square) is correct, and i2 is of type Square, but the second type assertion is wrong because i is storing r, which is not the type Square, i3 is not of type Square, and a message is displayed.
 
 
 ## Type Switches
 
-You can use a type switch to verify the type of the interface as sown below.
+You can use a type switch to verify the type of the interface, as shown below.
 
 ```go
 package main
@@ -1835,25 +1838,25 @@ package main
 import "fmt"
 
 func checkType(i interface{}) {
-	switch j := i.(type) {
-	case nil:
-		fmt.Println("i is nil")
-	case int:
-		fmt.Println("i is int")
-		fmt.Println(j)
-	case float64:
-		fmt.Println("i is float64")
-		fmt.Println(j)
+    switch j := i.(type) {
+    case nil:
+        fmt.Println("i is nil")
+    case int:
+        fmt.Println("i is int")
+        fmt.Println(j)
+    case float64:
+        fmt.Println("i is float64")
+        fmt.Println(j)
 
-	case string:
-		fmt.Println("i is string")
-		fmt.Println(j)
-	}
+    case string:
+        fmt.Println("i is string")
+        fmt.Println(j)
+    }
 }
 
 func main() {
-	x := 6.3
-	checkType(x)
+    x := 6.3
+    checkType(x)
 }
 ```
 
@@ -1864,3 +1867,185 @@ i is float64
 6.3
 ```
 
+# Errors
+
+## How to Handle Errors
+
+If there is an error inside a function in Go, the last return value should be a value of type error.  If there are no errors, nil is returned.
+
+```go
+package main
+
+import (
+    "errors"
+    "fmt"
+    "os"
+)
+
+func division(numerator float64, denominator float64) (float64, error) {
+    if denominator == 0 {
+        return 0, errors.New("denominator cannot be zero")
+    }
+    return numerator / denominator, nil
+}
+
+func main() {
+    result, err := division(5.2, 2)
+
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+
+    }
+    fmt.Println(result) // 2.6
+
+    result, err = division(8.7, 0)
+
+    if err != nil {
+        fmt.Println(err) // denominator cannot be zero
+        os.Exit(1)
+
+    }
+    fmt.Println(result) // 2.6
+}
+```
+
+In the example above, the function division() checks if the denominator is zero. If that is the case, it will return an error for its last value; otherwise, it will return nil.  The first time division is called inside main() it is successful, and the result of the division is displayed.  The second time the denominator was zero, so an error is displayed, and the program exists.
+
+The built-in error interface defines the Error() method as shown below.
+
+```go
+type error interface {
+    Error() string
+}
+```
+
+When you create an error by calling the New function in the errors package, as shown in the example above.  The errors.New function takes a string and returns an error.  If you pass an error to fmt.Println, it automatically calls the Error method.
+
+Another way to create an error is using fmt.Errorf("message") as shown below. If you use fmt.Errorf, you do not need to import the errors package.
+
+```go
+func division(numerator float64, denominator float64) (float64, error) {
+    if denominator == 0 {
+        return 0, fmt.Errorf("denominator cannot be zero")
+    }
+    return numerator / denominator, nil
+}
+```
+
+You can define your own errors type as long as they implement the error interface, as shown below.
+
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+)
+
+type AppErr struct {
+    code    int
+    message string
+}
+
+func (e AppErr) Error() string {
+    return e.message
+}
+
+func division(numerator float64, denominator float64) (float64, error) {
+    if denominator == 0 {
+        return 0, AppErr{code: 1, message: "division by zero"}
+    }
+    return numerator / denominator, nil
+}
+
+func main() {
+    result, err := division(5.2, 0)
+
+    if err != nil {
+        appErr := err.(AppErr)
+        fmt.Println(appErr.code, appErr.message)
+        os.Exit(1)
+
+    }
+    fmt.Println(result) // 2.6
+
+}
+```
+
+In this example, we create a type named AppErr that includes an error code and the message. We are using type assertions, but another way is using the errors.As function as shown below.
+
+```go
+    if err != nil {
+        var appErr AppErr
+        if errors.As(err, &appErr) {
+            fmt.Println(appErr.code, appErr.message)
+        }
+        os.Exit(1)
+
+    }
+```
+
+The errors.As function returns true if a returned error matches a specific type.  Notice that the second argument passed to errors.As is a pointer to a variable of the type we are checking.
+
+You can use the function errors.Is to check if an error matches a custom error type.  For example, in the previous example, you can check that error matches AppErr, as shown below.
+
+```go
+if errors.Is(err, appErr) {
+    fmt.Println("Yes")
+} else {
+    fmt.Println("No")
+}
+```
+
+## panic and recover
+
+A panic is generated when there is a situation where Go is unable to figure out what to do next.  For example, the server ran out of memory, read a non-existing file, etc.  When panic occurs, the function immediately exits, and any defers attached to the function starts running.  You can create your own panic using the panic function, as shown below.
+
+```go
+package main
+
+import "fmt"
+
+func division(numerator float64, denominator float64) float64 {
+    if denominator == 0 {
+        panic("division by zero")
+    }
+    return numerator / denominator
+}
+
+func main() {
+    result := division(5, 0)
+    fmt.Println(result)
+}
+```
+
+If you run this program, a panic message will be print out, followed by a stack trace.
+
+You can gracefully handle panic situations using the built-in function recover.  The recover function must be called from a defer since once the panic occurs, only defer is executed, for example.
+
+```go
+package main
+
+import "fmt"
+
+func division(numerator float64, denominator float64) float64 {
+    defer func() {
+        if v := recover(); v != nil {
+            fmt.Println(v)
+        }
+    }()
+    if denominator == 0 {
+        panic("division by zero")
+    }
+    return numerator / denominator
+}
+
+func main() {
+    result := division(5, 0)
+    fmt.Println(result)
+    fmt.Println("end of the program")
+}
+```
+
+In this example, when a panic occurs, the defer function is invoked, and the error message is printed. The program continues with its execution and prints "end of the program." Usually, when a panic occurs, you do not want to continue executing the program but gracefully shutdown.
