@@ -49,6 +49,11 @@
 - [Errors](#errors)
   - [How to Handle Errors](#how-to-handle-errors)
   - [panic and recover](#panic-and-recover)
+- [Repositories,  Modules, and Packages](#repositories--modules-and-packages)
+  - [Create a Go Module](#create-a-go-module)
+  - [Building a Package](#building-a-package)
+    - [Using a Package](#using-a-package)
+  - [Package Name Conflicts](#package-name-conflicts)
 # Go Programming Language
 
 # Setting up Go
@@ -2049,3 +2054,162 @@ func main() {
 ```
 
 In this example, when a panic occurs, the defer function is invoked, and the error message is printed. The program continues with its execution and prints "end of the program." Usually, when a panic occurs, you do not want to continue executing the program but gracefully shutdown.
+
+# Repositories,  Modules, and Packages
+
+A repository is a place in a version control system where source code for a project is stored.  A module is the root of a Go library or application.  Modules consist of one or more packages.
+
+Every module has a globally unique name.  In Go, we usually use the path to the module repository.  For example https://github.com/blasvinas/golang
+
+## Create a Go Module
+
+In the following example, we will create a module with some basic math operations functions. Then we will the function from another module.  
+
+First, create a directory for your module.
+
+```shell
+% mkdir mathop  
+% cd mathop 
+```
+To create a module, you need to create a go.mod file in the module's root directory.  You can create this file with the command go mod init modle_path.
+
+```shell
+% go mod init github.com/blasvinas/golang/mathops
+go: creating new go.mod: module github.com/blasvinas/golang/mathops
+
+% ls -la
+total 8
+drwxr-xr-x@ 3 blasvinas  staff   96 Apr 16 08:12 .
+drwxr-xr-x@ 9 blasvinas  staff  288 Apr 16 08:09 ..
+-rw-r--r--  1 blasvinas  staff   51 Apr 16 08:12 go.mod
+```
+
+The go mod init command created the file go.mod which has the following content.
+
+```shell
+module github.com/blasvinas/golang/mathops
+
+go 1.16
+```
+
+The go.mod file starts with the word module and the path.  The following line specifies the version that your code supports.
+
+## Building a Package
+
+Now let create the package with the math functions.  Let's name it mathops.go
+
+```go
+package mathops
+
+func Add(x int, y int) int {
+    return x + y
+}
+
+func Subtract(x int, y int) int {
+    return x - y
+}
+```
+
+The first line is the package clause.  It consists of the keyword package and the name of the package.  Then, you have the functions that are part of the package.
+
+Notice that the name of the functions is capitalized.  This is the way Go makes the functions public and can be used by other modules.   Functions and variables that are not capitalized are private and can only be used inside the module.
+
+As a general rule, you should make the package's name match the directory's name, except for the main program, since you cannot import main.
+
+### Using a Package
+
+For this example, we are creating a directory named prog at the same level that the directory mathops, where the package is. Hence, the root directory has the directory mathops and prog.
+
+```shell
+% ls
+mathops     prog
+```
+
+We need to create the go.mod file in the prog directory similar to the mathops module.
+
+```shell
+% go mod init github.com/blasvinas/golang/prog 
+go: creating new go.mod: module github.com/blasvinas/golang/prog
+go: to add module requirements and sums:
+    go mod tidy
+```
+
+Now, let's create a file called main.go with the following content in the prog directory.
+
+```go
+package main
+
+import (
+    "fmt"
+
+    "github.com/blasvinas/golang/mathops"
+)
+
+func main() {
+    result := mathops.Add(5, 2)
+    fmt.Println(result)
+    result = mathops.Subtract(5, 2)
+    fmt.Println(result)
+}
+```
+
+To use a package, you need to import it using import as shown above.  In this example, we are importing the fmt and mathops packages.
+
+For productions, your mathops module should be published to GitLab, and Go can download the module from there.  In this example, we are working with a local copy, so the following steps are needed to resolve the dependencies.
+
+```shell
+% go mod edit -replace=github.com/blasvinas/golang/mathops=../mathops
+```
+
+The go.mod should look similar to the one below.
+
+```shell
+module github.com/blasvinas/golang/prog
+
+go 1.16
+
+replace github.com/blasvinas/golang/mathops => ../mathops
+```
+
+
+We need to run the go mod tiddy command.
+
+```shell
+% go mod tidy
+go: found github.com/blasvinas/golang/mathops in github.com/blasvinas/golang/mathops v0.0.0-00010101000000-000000000000
+```
+
+Now the go.mod should look similar to this.
+
+```shell
+module github.com/blasvinas/golang/prog
+
+go 1.16
+
+replace github.com/blasvinas/golang/mathops => ../mathops
+
+require github.com/blasvinas/golang/mathops v0.0.0-00010101000000-000000000000
+```
+
+The program is ready to run now.   
+
+
+```shell
+% go run .
+7
+3
+```
+
+## Package Name Conflicts
+
+There are situations when you might need to import packages with the same name.  For example, the standard library includes the packages:  crypto/rand and math rand.  Suppose you need to import these packages in your program. In that case, it can resolve the conflict by providing an alternative name for one of the packages, as shown below.
+
+```go
+import (
+    "fmt"
+    crand "crypto/rand"
+    "math/rand"
+)
+```
+
+We can call the functions that belong to the crypto/rand packages using the crand name in the program.
