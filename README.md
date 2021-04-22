@@ -54,6 +54,10 @@
   - [Building a Package](#building-a-package)
     - [Using a Package](#using-a-package)
   - [Package Name Conflicts](#package-name-conflicts)
+- [Concurrency](#concurrency)
+  - [Goroutines](#goroutines)
+  - [Channels](#channels)
+  - [select](#select)
 # Go Programming Language
 
 # Setting up Go
@@ -2213,3 +2217,92 @@ import (
 ```
 
 We can call the functions that belong to the crypto/rand packages using the crand name in the program.
+
+# Concurrency
+
+Before using concurrency, be sure that your program benefits from it. Using concurrency does not always make your program faster. Actually, in some cases, concurrency can make your program run slower. Use concurrency when you want to combine data from multiple operations that can operate independently. Also, you won't get too much benefit from concurrency if the process doesn't take a lot of time. Some in-memory algorithms are so fast the using concurrency is an overhead. Concurrency is often used for I/O to disk or network since these operations are usually slower than in-memory processes.
+
+## Goroutines
+
+Before working with goroutines, there are some essential concepts that we need to understand. The first is a process. A process is an instance of a program that is being run by the operating system. The operating system assigns resources like memory and CPU to the process. It makes sure that other processes can't access them. A process is composed of one or more threads. A thread is a unit of execution that is given some time to run by the operating system. Threads within a process share access to the resources. A CPU can execute instructions from one or more threads depending on the number of cores.
+
+Goroutines are lightweight processes managed by the Go runtime. When a Go program starts, it creates several threads and lunches a single goroutine to run your program. All the goroutines created by your program are assigned to these threads. Go managing the threads instead of the operating system has several benefits like faster goroutine creation, thread stack sizes can grow as needed, faster switching between goroutines, etc.
+
+You can lunch a goroutine by placing the go keyword before a function.
+
+```go
+go func process() {
+ ...
+}
+```
+
+## Channels
+
+Goroutines communicate using channels. Channels are reference types. 
+
+You can declare a channel as follow.
+
+```go
+ch := make(chan int)
+```
+
+By default, channels are unbuffered, so writing to a channel causes a writing goroutine to pause until another goroutine reads from the channel. The same applies to reading. A reading goroutine pause until another goroutine writes to the channel.
+
+In Go, you can create a buffered channel specifying the capacity when declaring the channel.
+
+```go
+ch := make(chan int, 20)
+```
+
+The function len returns how many values are in the channel, and the function cap returns the maximum capacity.
+
+Use the <- to read from and write to a channel.
+
+```go
+x := <-ch // read from channel
+ch <- x // write to a channel
+```
+
+Also, you can read from a channel using a for-range loop.
+
+```go
+for v := range ch {
+ fmt.print(v)
+}
+```
+
+Use the close function to close a channel.
+
+```go
+close(ch)
+```
+
+You can use the ok operator when reading from a channel to make use the channel is still open.
+
+```go
+v, ok := <- ch
+```
+
+If ok is true, the channel is open. If ok is false, the channel is closed.
+
+If you try to write to or close a closed channel, the program will crash.
+
+## select
+
+When a goroutine performs operations on different channels, use the select statement.
+
+```go
+select {
+case v := <-ch:
+ fmt.Println(v)
+case v := <-ch2:
+ fmt.Println(v)
+case ch3 <- x:
+ fmt.Println("wrote", x)
+case <-ch4:
+ fmt.Println("got value on ch4, but ignored it")
+}
+```
+
+If there are several channels ready, the select statement picks one randomly.
+
