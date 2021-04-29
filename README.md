@@ -1104,7 +1104,7 @@ If you need only the key, you can leave the second variable off.
 	numbers := map[string]int{"one": 1, "two": 2, "three": 3}
 
 	for k := range numbers {
-		fmt.Println(v)
+		fmt.Println(k)
 	}
 ```
 
@@ -1463,7 +1463,7 @@ A pointer contains the address where a variable is stored.  You declare a variab
     x := 5
 
     p = &x // assign to p the location in memory of x
-    fmt.Println(p). // Something similar to this:  0xc0000be010
+    fmt.Println(p) // Something similar to this:  0xc0000be010
     fmt.Println(*p) // 5
 ```
 
@@ -1915,7 +1915,7 @@ func main() {
         os.Exit(1)
 
     }
-    fmt.Println(result) // 2.6
+    fmt.Println(result) // This line won't execute
 }
 ```
 
@@ -1977,7 +1977,7 @@ func main() {
         os.Exit(1)
 
     }
-    fmt.Println(result) // 2.6
+    fmt.Println(result) // this line won't execute
 
 }
 ```
