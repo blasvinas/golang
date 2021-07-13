@@ -6,19 +6,23 @@
   - [Go Standard format](#go-standard-format)
   - [Go Style](#go-style)
   - [Running the program program](#running-the-program-program)
+- [Names](#names)
 - [Data Types](#data-types)
   - [Booleans](#booleans)
   - [Integers](#integers)
   - [Floating Point](#floating-point)
   - [Complex Numbers](#complex-numbers)
   - [Strings](#strings)
+  - [Convertion Between Strings and Numbers](#convertion-between-strings-and-numbers)
   - [Runes](#runes)
+  - [Unicode](#unicode)
 - [Operators](#operators)
   - [Arithmetic Operators](#arithmetic-operators)
   - [Comparison Operators](#comparison-operators)
   - [Logical Operators](#logical-operators)
 - [Variables](#variables)
 - [Constants](#constants)
+- [Scope](#scope)
 - [Arrays](#arrays)
 - [Slices](#slices)
   - [append](#append)
@@ -29,6 +33,9 @@
 - [Maps](#maps)
   - [delete](#delete)
 - [Structs](#structs)
+  - [Struct Embedding](#struct-embedding)
+    - [Anonymous fields](#anonymous-fields)
+- [JSON](#json)
 - [if](#if)
 - [for](#for)
 - [switch](#switch)
@@ -39,6 +46,7 @@
   - [Closures](#closures)
   - [defer](#defer)
 - [Pointers](#pointers)
+  - [New](#new)
 - [Methods](#methods)
 - [iota](#iota)
 - [Composition](#composition)
@@ -49,7 +57,7 @@
 - [Errors](#errors)
   - [How to Handle Errors](#how-to-handle-errors)
   - [panic and recover](#panic-and-recover)
-- [Repositories,  Modules, and Packages](#repositories--modules-and-packages)
+- [Repositories, Modules, and Packages](#repositories-modules-and-packages)
   - [Create a Go Module](#create-a-go-module)
   - [Building a Package](#building-a-package)
     - [Using a Package](#using-a-package)
@@ -57,6 +65,7 @@
 - [Concurrency](#concurrency)
   - [Goroutines](#goroutines)
   - [Channels](#channels)
+  - [Example](#example)
   - [select](#select)
 # Go Programming Language
 
@@ -107,18 +116,18 @@ go env
 GO111MODULE=""
 GOARCH="amd64"
 GOBIN=""
-GOCACHE="/Users/blasvinas/Library/Caches/go-build"
-GOENV="/Users/blasvinas/Library/Application Support/go/env"
+GOCACHE="/Users/user01/Library/Caches/go-build"
+GOENV="/Users/user01/Library/Application Support/go/env"
 GOEXE=""
 GOFLAGS=""
 GOHOSTARCH="amd64"
 GOHOSTOS="darwin"
 GOINSECURE=""
-GOMODCACHE="/Users/blasvinas/go/pkg/mod"
+GOMODCACHE="/Users/user01/go/pkg/mod"
 GONOPROXY=""
 GONOSUMDB=""
 GOOS="darwin"
-GOPATH="/Users/blasvinas/go"
+GOPATH="/Users/user01/go"
 GOPRIVATE=""
 GOPROXY="https://proxy.golang.org,direct"
 GOROOT="/usr/local/go"
@@ -155,9 +164,9 @@ func main() {
 
 Even though this is a very short program, it contains most of the go programs' typical layout. Let's check the program line by line.
 
-* go package main. Every go file starts with a package clause. A package is a collection of code that is related. For example, the package math contains a collection of functions related to math. The package strings include code on string manipulation, etc. When you create your go files, the convention is to follow the package clause with the file's name (without the extension). In this example, the file is named main.go, so we start with package main. All the code in this file belongs to the main package.
+* package main. Every go file starts with a package clause. A package is a collection of code that is related. For example, the package math contains a collection of functions related to math. The package strings include code on string manipulation, etc. When you create your go files, the convention is to follow the package clause with the file's name (without the extension). In this example, the file is named main.go, so we start with package main. All the code in this file belongs to the main package.
 * import "fmt." This line import the fmt package, which contains the Println function. Go does not allow to import packages that are not used in the program. Most editors or IDEs will automatically delete the import line if the package is not used.
-* func main {. main is a special function in go, and it marks the entry point of the program. The program that you run from a terminal must have the main function.
+* func main(). main is a special function in go, and it marks the entry point of the program. The program that you run from a terminal must have the main function.
 
 ## Go Standard format
 
@@ -213,7 +222,7 @@ This will runs golint over the entire project.
 
 ## Running the program program
 
-You can run a Go program in n different ways.  Supposed that you called the program above main.go, you use the go run command as shown below:
+You can run a Go program in different ways.  Supposed that you called the program above main.go, you use the go run command as shown below:
 
 ```shell
 go run main.go           
@@ -222,7 +231,7 @@ Hello, Gophers!
 
 Using the go run command, the program is compiled to a temporary location, executed, and then the binaries are deleted.
 
-If you want to compile the program ans save the binaries, run go build main.go.  This command will create a binary called main in MacOS and Linux and main.exe in Windows.  You can use the -o flag to create the binary with a different name.  For example:
+If you want to compile the program and save the binaries, run go build main.go.  This command will create a binary called main in MacOS and Linux and main.exe in Windows.  You can use the -o flag to create the binary with a different name.  For example:
 
 ```shell
 go build -o hello main.go
@@ -237,6 +246,14 @@ go install github.com/git_user/golang/hello_world@latest
 ```
 
 This will download the files from the git repository in github.com/git_user/golang/hello_world and installed in \$GOPATH/bin/hello_world
+
+# Names
+
+The names of variables, constants, types functions, and packages must begin with a letter or an underscore follow by any number of additional letters, digits, and underscores. Go is case sensitive so count and Count are different names.
+
+The style in Go is to use camel case for names. In camel case when you combine words you capitalize the first letter of each word, excep the first word.  For example:  firstName, monthlySalesReport, etc.  When using acronys, always use the same case.  For example getHTTPResponse. If a name starts with a upper-case letter, it is exported, which means it is accessible outside the package.  Names starting with lowercase are only visible inside te package. 
+
+ 
 
 
 # Data Types
@@ -282,11 +299,12 @@ Go has the following integer types.
 | int32 | -2147483648 to 2147483647 |
 | int64 | -9223372036854775808 to 9223372036854775807 |
 
-Go define some aliases to some of of the integer types as described below.
+Go defines some aliases to some of of the integer types as described below.
 
 * byte alias to uint8.
 * int alias to int32 or int64 depending on the number of bits of the CPU where you are running the program.
 * uint alias to unsigned int.
+* rune alias to int32
 
 Unless you have a specific need about the size or the sign,  use int when declaring your variables.
 
@@ -332,7 +350,7 @@ func main() {
 }
 ```
 
-You float64 unless you have a specific need to use float32.
+Use float64 unless you have a specific need to use float32.
 
 ## Complex Numbers
 
@@ -399,6 +417,84 @@ Remember that strings are immutable, so a program with the following lines won't
     s[1] = 'a'  // Error: cannot assign to s[1] (strings are immutable)
 ```
 
+You can concatenate two strings using the + operator.
+
+```go
+s := "Hello"
+s = s + " World"
+s += "!"
+fmt.Println(s) // Hello World!
+```
+
+You can create a raw string using backquotes.  Escape sequences like \n or \t are not processed.
+
+
+```go
+s := `The escapes sequences \n and \t are not processed`
+fmt.Println(s) // The escapes sequences \n and \t are not processed
+```
+
+As mentioned before, strings in Go are immutable, so every time we modify a string variable, a new string is created with the new value and then copied to existing variable. If you need to do a lot of string manipulation this can be very inefficient.  An alternative is to use the bytes.Buffer. Byte slices are mutable, so we avoid the allocation and copying. When we are done, we can covert the byte slice back to a string.
+
+```go
+var b bytes.Buffer
+b.WriteString("Hello")
+b.WriteString(" Gophers!")
+b.WriteString(" I love ")
+b.WriteString("programming in Go!")	
+s := b.String()
+fmt.Println(s)
+```
+
+## Convertion Between Strings and Numbers
+
+You can convert integers and floats to a string using fmt.Sprintf.
+
+```go
+	x := 7
+	y := 3.4
+	s := fmt.Sprintf("%d",x)
+	fmt.Println(s) // 7
+	s = fmt.Sprintf("%f",y)
+	fmt.Println(s) // 3.400000
+```
+
+An alternative to convert integers to strings is strconv.Itoa.
+
+```go
+x := 7
+s := strconv.Itoa(x)
+fmt.Println(s) // 7
+```
+
+To convert from string to integer you can use strconv.Atoi or strconv.ParseInt.  To conver a string to a float you can use strconv.ParseFloat
+
+```go
+	s := "7"
+	x, err := strconv.Atoi(s)
+	if err != nil {
+		fmt.Printf("%s cannot be converted to an integer\n", s)
+		os.Exit(-1)
+	}
+	fmt.Println(x) // 7
+
+	s = "88"
+	y, err := strconv.ParseInt(s, 10, 64)  // Base 10,  64-bit
+	if err != nil {
+		fmt.Printf("%s cannot be converted to an integer\n", s)
+		os.Exit(-1)
+	}
+	fmt.Println(y) // 88
+
+	s = "7.3"
+	z, err := strconv.ParseFloat(s, 64) // 64-bit
+	if err != nil {
+		fmt.Printf("%s cannot be converted to a float\n", s)
+		os.Exit(-1)
+	}
+	fmt.Println(z) // 7.3
+```
+
 ## Runes
 
 Runes are used to represent single characters.  The rune type is an alias for the int32 type.  In Go, runes are written using single quotes.
@@ -418,6 +514,24 @@ func main() {
 ```
 
 When you print a run, the output will be the numeric code representing the rune and not the original character. So, the program above with print 65 instead of A.
+
+## Unicode
+
+UTF-8 is the preferred encoding for string in Go.  Since many unicode character are  difficult to type, you can use their numeric code point value.  
+
+```go
+s := "\u2fd5"
+fmt.Println(s) // ⿕
+```
+
+UTF-8 character might take more that one byte, so if you use the len fuction to get the number of characters,  you might get a different result than expected. To get an accurate count use utf8.RuneCountInString instead.
+
+```go
+s := "\u2fd5"
+fmt.Println(s) // ⿕
+fmt.Println(len(s)) // 3
+fmt.Println(utf8.RuneCountInString(s)) // 1
+```
 
 # Operators
 
@@ -439,7 +553,11 @@ Go has the following arithmetic operators.
 | <<|   left shift |            integer << unsigned integer |
 | >>|   right shift  |          integer >> unsigned integer |
 
-You can combine the arithmetic operator with = to modify a variable, for example +=, *=, -+, /=, ++, --.  See the example below.
+You can combine the arithmetic operators with = to modify a variable, for example +=, *=, -+, /=.  See the example below.
+
+In Go, the sign of the remainder is always the same as the sign of the dividend, so the tesult -10 % 3 is -1 and 10 % -3 is 1.
+
+The result of the / operator depends on whether its operands are intergers of floats, so 5 / 2 is 2 and 5.0 / 2.0 is  2.5
 
 ## Comparison Operators
 
@@ -520,7 +638,7 @@ func main() {
 
 # Variables
 
-In Go, you have several ways to declare a variable. The most verbose way is using the var keyword, explicitly specify the type, and assign a value. 
+In Go, you have several ways to declare a variable. The most verbose way is using the var keyword, explicitly specify the type, and assign a value. The zero value is 0 for numbers, false for booleans, "" for strings, and nil for interfaces and references types like slices, pointer, maps, channel and functions.  The zero value for arrays and struncts is the zero value of its elements.   The zero value ensures that you do not have uninitialized variables.
 
 ```go
 var a int = 5
@@ -534,7 +652,7 @@ When you assign a value to a variable during the declaration, you can omit the t
 var a = 5
 ```
 
-If you just need to declare a variable;e and assign a value later, you need to specify the type. The variable will be initialized to the zero value.
+If you just need to declare a variable and assign a value later, you need to specify the type. The variable will be initialized to the zero value.
 
 ```go
 var a int // initialized to 0 (zero value)
@@ -559,7 +677,7 @@ var (
 )
 ```
 
-Another way to declare a variable is using the := operator. 
+Another way to declare a variable is using the := operator. This form is called short variable declaration.
 
 ```go
 i := 5
@@ -570,10 +688,10 @@ a, b := 4, 3
 You can only use the := operator inside a function. You cannot use it to declare variables at the package level. Also, using :=, you can assign values to an existing variable as long as one variable on the lefthand side of the := is new.
 
 ```go
-x = 5
+x := 5
 x, y := 3, 2
-a = 4
-y, a = 6, 8 // Error, a and y already exist
+a := 4
+y, a := 6, 8 // Error, a and y already exist
 ```
 
 In Go, you must use a variable. If you declare a variable in a function and don't use it, you will get an error at compilation time.
@@ -622,14 +740,86 @@ If you declare a constant with a type, it can only be assigned to a variable of 
  var y int = a
 ```
 
+# Scope
+
+A name define inside a block is not visible outside that block.  A block is a sequence of statements enclosed in curly braces.
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func f() {
+	s := "I love Go!"
+}
+
+
+func main() {
+	f()
+	fmt.Println(s)  // Error: undefined: s
+}
+```
+
+If you run the program above, you get the error  undefined: s.  That is becuase s is only visible inside the function f().
+
+Variable declared at the package level are visible everywhere in the package. 
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+var s string
+
+func f() {
+	s = "I love Go!"
+}
+
+
+func main() {
+	f()
+	fmt.Println(s) // I love Go!
+}
+```
+
+In this example we moved the declaration of the variable s outside the function f() and now it is accesible in main().
+
+If you declare a local vaiable with the same name as a package variable, the local variable will shadow or hide the package one.
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+var s string = "Hello Gophers!"
+
+func f() {
+	s := "I love Go!"
+	fmt.Println(s)
+}
+
+func main() {
+	f() // I love Go!
+	fmt.Println(s) // Hello Gophers!
+}
+```
+
+As you can see in the example above, inside f() we declare a local variable s and Println displays "I love Go!".  The main() function is using the package varaible so it displays "Hello Gophers!"
+
 # Arrays
 
-Most of the time, you will not use arrays directly in go since they have several limitations.  For the vast majority of the cases, use slices (which we will explain in the next section) instead of arrays.
+Most of the time, you will not use arrays directly in Go since they have several limitations.  For the vast majority of the cases, use slices (which we will explain in the next section) instead of arrays.
 
 Below are several ways you can use to declare an array.
 
 ```go
-var a[5] int // array of 5 integers each one initialized to 0
+var a [5]int // array of 5 integers each one initialized to 0
     var a = [3]int{1, 2, 3} //arrray of 3 integers wich values of 1,2, and 3
     var b = [...]float64{1.1, 5.3, 7.8}  // Array of 3 float64 numbers.
     var c = [10]int{1,2,5:8,8:2} //{1,2,0,0,8,0,0,2,0,0}
@@ -644,7 +834,7 @@ You can access the elements of an array using the brackets and the index.
 a[5] = 8
 ```
 
-The length of the array must be known at compilation time, so you cannot use a variable to define the number of elements.  The following won't compile.
+The length of the array must be known at compilation time, so you cannot use a variable to define the number of elements.  The following program won't compile.
 
 ```go
 package main
@@ -694,6 +884,36 @@ func main() {
     var x = [2][3]int{{1, 2, 3}, {4, 5, 6}}
     fmt.Println(x[1][2]) // 6
 
+}
+```
+
+You can use range to iterate over the array.
+
+```go
+x := [...]int{10, 20, 30, 40, 50}
+
+for index, value := range x {
+    fmt.Println(index, value)
+}
+```
+
+This program displays:
+
+```shell
+0 10
+1 20
+2 30
+3 40
+4 50
+```
+
+If you are not interested in the index, you can modify the for loop as shown below.
+
+```go
+x := [...]int{10, 20, 30, 40, 50}
+
+for _, value := range x {
+    fmt.Println(value)
 }
 ```
 
@@ -753,7 +973,7 @@ import (
 func main() {
     x := []int{1,2,3}
     fmt.Println(len(x), cap(x)) // 3 3
-     x = append(x,4)
+    x = append(x,4)
     fmt.Println(len(x), cap(x)) // 4 6
     x = append(x,5,6)
     fmt.Println(len(x), cap(x)) // 6 6
@@ -830,10 +1050,10 @@ func main() {
 Use maps when you need to associate one value with another.  Maps are key-value pairs.  You can declare a map using map[key_type]value_type.
 
 ```go
-    numbers := map[string]int{}
-    numbers["one"] = 1
-    numbers["two"] = 2
-    numbers["three"] = 3
+numbers := map[string]int{}
+numbers["one"] = 1
+numbers["two"] = 2
+numbers["three"] = 3
 ```
 
 Also, you can assign values when declaring the map.
@@ -853,25 +1073,25 @@ The previous example creates a map with a default size of 5.
 If you access a non-existing key, it will return the zero value, for example.
 
 ```go
-    numbers := make(map[string]int,3)
-    numbers["one"] = 1
-    numbers["two"] = 2
-    numbers["three"] = 3
-    
-    fmt.Println(numbers["two"]) // 2
-    fmt.Println(numbers["four"]) // 0
+numbers := make(map[string]int,3)
+numbers["one"] = 1
+numbers["two"] = 2
+numbers["three"] = 3
+
+fmt.Println(numbers["two"]) // 2
+fmt.Println(numbers["four"]) // 0
 ```
 
 Since there is no element with the "four" key, zero is displayed if you try to access the map using this key.  There are times when you need to know if the key didn't exist or if the value was zero.  In these cases, you can use the comma ok idiom.
 
 ```go
-    numbers := map[string]int{}
-    numbers["one"] = 1
-    numbers["two"] = 2
-    numbers["three"] = 3
-    
-    value, ok := numbers["four"]
-    fmt.Println(value, ok) // 0 false
+numbers := map[string]int{}
+numbers["one"] = 1
+numbers["two"] = 2
+numbers["three"] = 3
+
+value, ok := numbers["four"]
+fmt.Println(value, ok) // 0 false
 ```
 Println displays 0 false.  The ok variable is true if the key exists or false if it doesn't.
 
@@ -890,6 +1110,26 @@ You can delete an element from the map using the delete function.  The delete fu
 
 In the example above, we deleted the element with the key "two."
 
+You can iterate over a map similar to the way you do with arrays and slides, using a range.
+
+```go
+numbers := map[string]int{"one": 1, "two":  2, "three": 3}
+
+for key, value := range numbers {
+    fmt.Println(key, value)
+}
+```
+ 
+The output of the program above is:
+
+```shell
+two 2
+three 3
+one 1
+```
+
+Since maps are unordered, the order might be different every time you run the program.
+
 # Structs
 
 Use a struct when you have related data that needs to be group together. The example below shows the syntax to declare a struct in Go.
@@ -902,7 +1142,7 @@ type car struct {
 }
 ```
 
-Here, we declared a struct named car that has three variables.
+Here, we declared a struct named car that has three variables. Each individual variable in a struct is called a field.
 
 ```go
     type car struct {
@@ -929,7 +1169,7 @@ Here, we declared a struct named car that has three variables.
     fmt.Println(car3) // {2017 Nissan Altima}
 ```
 
-The previous example shows how to define a struct type and several ways to declare and initialize the struct's variables.
+The previous example shows how to define a struct type and several ways to declare and initialize the struct's variables.  The fields are accessed using the dot notation like car1.model, as shown above.
 
 There is another way to declare a struct named anonymous struct, shown in the example below.
 
@@ -945,6 +1185,136 @@ There is another way to declare a struct named anonymous struct, shown in the ex
     }
 
     fmt.Println(car1) // {2017 Nissan Altima}
+```
+
+The fields in the struct above, cannot be accessed from another package because the names are in lower case so they are not exported.  If you need to access the fields from a different package change start the names with upper case, as shown below. 
+
+```go
+type Car struct {
+    Year  int
+    Make  string
+    Model string
+}
+```
+
+The zero value of a struct is composed of the zero values of each field.
+
+## Struct Embedding
+
+Sometimes we need to use a struct inside another struct.  For example.
+
+```go
+package main
+
+import "fmt"
+
+type PersonInfo struct {
+	Name string
+	Age  int
+}
+
+type EmployeeInfo struct {
+	Person PersonInfo
+	Salary int
+}
+
+func main() {
+	var emp EmployeeInfo
+
+	emp.Person.Name = "Joe Doe"
+	emp.Person.Age = 35
+	emp.Salary = 50000
+
+	fmt.Println(emp)
+}
+```
+
+As you can see, if you need to access the name of age of an employee, you need to specify the name of the struct and then the field, which is a little verbose.
+
+### Anonymous fields
+
+When embedding structures, you can declare the type but not the name.  See example below.
+
+```go
+package main
+
+import "fmt"
+
+type PersonInfo struct {
+	Name string
+	Age  int
+}
+
+type EmployeeInfo struct {
+	PersonInfo 
+	Salary int
+}
+
+func main() {
+	var emp EmployeeInfo
+
+	emp.Name = "Joe Doe"
+	emp.Age = 35
+	emp.Salary = 50000
+
+	fmt.Println(emp)
+}
+```
+
+As you can see in the declaration of EmployeeInfo, we declare an anonymous PersonInfo field.  This allow us to access the fields of the PesonInfo type directly from an instance of EmployeeInfo.
+
+# JSON
+
+Java Object Notation (JSON) is a popular standard notation for sending and receiving structured information.  Go supports encoding and decoding  JSON.  The json.Marshal function convert Go data to JSON and the function json.Unmarshal convert from JSON to Go data.
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+)
+
+type Server struct {
+	Name    string
+	IP      string
+	Mask    string
+	Aliases []string
+}
+
+// Converts from Server struct to JSON
+func writeJSON(server Server) []byte {
+	data, err := json.Marshal(server)
+	if err != nil {
+		log.Fatalf("Error converting to JSON %s", err)
+	}
+	return data
+}
+
+// Converts from JSON to a Server struct
+func readJSON(jsonData []byte) Server {
+	var server Server
+	if err := json.Unmarshal(jsonData, &server); err != nil {
+		log.Fatalf("Error reading json %s", err)
+	}
+	return server
+}
+
+func main() {
+	server01 := Server{
+		Name:    "Server01",
+		IP:      "10.1.1.2",
+		Mask:    "255.0.0.0",
+		Aliases: []string{"webserver01", "httpserver01"},
+	}
+
+	result := writeJSON(server01) // convert to JSON
+	fmt.Printf("%s\n", result)
+
+	server02 := readJSON(result) // convert from json to Server struct
+	fmt.Println(server02)
+}
 ```
 
 # if
@@ -1496,6 +1866,42 @@ func main() {
 ```
 
 The zero value of pointers is nil, which means no value has been assigned to a variable yet.
+
+Functions can return the address of a local variable.
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func returnAddress() *int {
+	y := 5
+	return &y
+}
+
+func main() {
+    a := returnAddress()
+    fmt.Println(a)  // Something like 0xc000018050
+    fmt.Println(*a) // 5
+}
+```
+
+In this example, you can access the value of y even after the function has returned.  
+
+## New
+
+You can create an unnamed variable using the new(T) function.
+
+```go
+p := new(int)
+*p = 10
+fmt.Println(p) // Something like 0xc000018050
+fmt.Print(*p) // 10
+```
+
+In the previous example p := new(int), created a unnamed variable of type int and assign its address to p.
 
 # Methods
 
@@ -2059,11 +2465,11 @@ func main() {
 
 In this example, when a panic occurs, the defer function is invoked, and the error message is printed. The program continues with its execution and prints "end of the program." Usually, when a panic occurs, you do not want to continue executing the program but gracefully shutdown.
 
-# Repositories,  Modules, and Packages
+# Repositories, Modules, and Packages
 
 A repository is a place in a version control system where source code for a project is stored.  A module is the root of a Go library or application.  Modules consist of one or more packages.
 
-Every module has a globally unique name.  In Go, we usually use the path to the module repository.  For example https://github.com/blasvinas/golang
+Every module has a globally unique name.  In Go, we usually use the path to the module repository.  For example https://github.com/user01/golang
 
 ## Create a Go Module
 
@@ -2078,20 +2484,20 @@ First, create a directory for your module.
 To create a module, you need to create a go.mod file in the module's root directory.  You can create this file with the command go mod init modle_path.
 
 ```shell
-% go mod init github.com/blasvinas/golang/mathops
-go: creating new go.mod: module github.com/blasvinas/golang/mathops
+% go mod init github.com/user01/golang/mathops
+go: creating new go.mod: module github.com/user01/golang/mathops
 
 % ls -la
 total 8
-drwxr-xr-x@ 3 blasvinas  staff   96 Apr 16 08:12 .
-drwxr-xr-x@ 9 blasvinas  staff  288 Apr 16 08:09 ..
--rw-r--r--  1 blasvinas  staff   51 Apr 16 08:12 go.mod
+drwxr-xr-x@ 3 user01  staff   96 Apr 16 08:12 .
+drwxr-xr-x@ 9 user01  staff  288 Apr 16 08:09 ..
+-rw-r--r--  1 user01  staff   51 Apr 16 08:12 go.mod
 ```
 
 The go mod init command created the file go.mod which has the following content.
 
 ```shell
-module github.com/blasvinas/golang/mathops
+module github.com/user01/golang/mathops
 
 go 1.16
 ```
@@ -2132,8 +2538,8 @@ mathops     prog
 We need to create the go.mod file in the prog directory similar to the mathops module.
 
 ```shell
-% go mod init github.com/blasvinas/golang/prog 
-go: creating new go.mod: module github.com/blasvinas/golang/prog
+% go mod init github.com/user01/golang/prog 
+go: creating new go.mod: module github.com/user01/golang/prog
 go: to add module requirements and sums:
     go mod tidy
 ```
@@ -2146,7 +2552,7 @@ package main
 import (
     "fmt"
 
-    "github.com/blasvinas/golang/mathops"
+    "github.com/user01/golang/mathops"
 )
 
 func main() {
@@ -2162,17 +2568,17 @@ To use a package, you need to import it using import as shown above.  In this ex
 For productions, your mathops module should be published to GitLab, and Go can download the module from there.  In this example, we are working with a local copy, so the following steps are needed to resolve the dependencies.
 
 ```shell
-% go mod edit -replace=github.com/blasvinas/golang/mathops=../mathops
+% go mod edit -replace=github.com/user01/golang/mathops=../mathops
 ```
 
 The go.mod should look similar to the one below.
 
 ```shell
-module github.com/blasvinas/golang/prog
+module github.com/user01/golang/prog
 
 go 1.16
 
-replace github.com/blasvinas/golang/mathops => ../mathops
+replace github.com/user01/golang/mathops => ../mathops
 ```
 
 
@@ -2180,19 +2586,19 @@ We need to run the go mod tiddy command.
 
 ```shell
 % go mod tidy
-go: found github.com/blasvinas/golang/mathops in github.com/blasvinas/golang/mathops v0.0.0-00010101000000-000000000000
+go: found github.com/user01/golang/mathops in github.com/user01/golang/mathops v0.0.0-00010101000000-000000000000
 ```
 
 Now the go.mod should look similar to this.
 
 ```shell
-module github.com/blasvinas/golang/prog
+module github.com/user01/golang/prog
 
 go 1.16
 
-replace github.com/blasvinas/golang/mathops => ../mathops
+replace github.com/user01/golang/mathops => ../mathops
 
-require github.com/blasvinas/golang/mathops v0.0.0-00010101000000-000000000000
+require github.com/user01/golang/mathops v0.0.0-00010101000000-000000000000
 ```
 
 The program is ready to run now.   
@@ -2287,6 +2693,56 @@ If ok is true, the channel is open. If ok is false, the channel is closed.
 
 If you try to write to or close a closed channel, the program will crash.
 
+## Example
+
+The following example get the size in bytes or a web site. 
+
+```go
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+)
+
+type PageInfo struct {
+	url  string
+	size int
+}
+
+func responseSize(url string, channel chan PageInfo) {
+	fmt.Println("Getting", url)
+	response, err := http.Get(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer response.Body.Close()
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	channel <- PageInfo{url: url, size: len(body)}
+}
+
+func main() {
+	pageInfo := make(chan PageInfo)
+	go responseSize("https://golang.org", pageInfo)
+	go responseSize("http://www.ibm.com", pageInfo)
+	go responseSize("http://www.microsoft.com", pageInfo)
+	go responseSize("https://www.redhat.com", pageInfo)
+	fmt.Println(<-pageInfo)
+	fmt.Println(<-pageInfo)
+	fmt.Println(<-pageInfo)
+	fmt.Println(<-pageInfo)
+}
+```
+
+The program declared a struct with the url and the size of the web page.  It uses goroutines so it can query several websites at the same time.
+
+As you can see, the channel can hold any type, even user defined types.
+
 ## select
 
 When a goroutine performs operations on different channels, use the select statement.
@@ -2305,4 +2761,3 @@ case <-ch4:
 ```
 
 If there are several channels ready, the select statement picks one randomly.
-
